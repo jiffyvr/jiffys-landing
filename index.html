@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pink Boutique — launching soon</title>
+<meta name="description" content="Pink Boutique — soft things, bold vibes. Shop launching soon." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --b50:#fff0f6; --b100:#ffdeec; --b200:#ffc2dc; --b300:#ff97c2;
+    --b400:#ff5fa2; --b500:#fb3186; --b600:#e60f6c; --b700:#c00658;
+    --b800:#9d0a4b; --b900:#820d42;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh; color: var(--b900);
+    background: linear-gradient(to bottom, var(--b100), var(--b50) 40%, #ffffff);
+    overflow-x: hidden;
+  }
+  .blob { position: fixed; border-radius: 50%; filter: blur(64px); pointer-events: none; z-index: 0; }
+  .blob1 { width: 18rem; height: 18rem; background: rgba(255,151,194,.5); top: -6rem; left: -6rem; }
+  .blob2 { width: 18rem; height: 18rem; background: rgba(255,95,162,.3); top: 33%; right: -5rem; }
+  .blob3 { width: 16rem; height: 16rem; background: rgba(255,194,220,.5); bottom: 0; left: 25%; }
+  .wrap {
+    position: relative; z-index: 1; max-width: 480px; margin: 0 auto;
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    padding: 4rem 1.5rem 2rem;
+  }
+  .avatar {
+    width: 7rem; height: 7rem; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: 3rem;
+    background: linear-gradient(135deg, var(--b400), var(--b600));
+    box-shadow: 0 12px 30px rgba(251,49,134,.3); border: 4px solid #fff;
+  }
+  h1 { margin-top: 1.5rem; font-size: 1.6rem; font-weight: 700; letter-spacing: -.01em; color: var(--b900); }
+  .tagline { margin-top: .5rem; max-width: 20rem; text-align: center; font-size: .95rem; line-height: 1.5; color: rgba(192,6,88,.85); }
+  .links { margin-top: 2rem; width: 100%; display: flex; flex-direction: column; gap: 1rem; }
+  .pill {
+    display: flex; align-items: center; gap: .75rem; padding: 1rem 1.25rem;
+    border-radius: 1rem; border: 1px solid var(--b200); background: rgba(255,255,255,.8);
+    color: var(--b800); text-decoration: none; font-weight: 600;
+    box-shadow: 0 2px 8px rgba(251,49,134,.08); backdrop-filter: blur(6px);
+    transition: transform .2s, background .2s, color .2s, box-shadow .2s, border-color .2s;
+  }
+  .pill:hover { transform: translateY(-2px); background: var(--b500); color: #fff; border-color: var(--b400); box-shadow: 0 10px 24px rgba(251,49,134,.3); }
+  .pill .emoji { font-size: 1.25rem; }
+  .pill .label { flex: 1; text-align: center; }
+  .pill.disabled { opacity: .7; cursor: default; }
+  .pill.disabled:hover { transform: none; background: rgba(255,255,255,.8); color: var(--b800); border-color: var(--b200); box-shadow: 0 2px 8px rgba(251,49,134,.08); }
+  .pill .soon { font-size: .7rem; font-weight: 600; background: var(--b100); color: var(--b700); padding: .15rem .5rem; border-radius: 999px; }
+  .socials { margin-top: 2.5rem; display: flex; gap: 1rem; }
+  .social {
+    width: 2.75rem; height: 2.75rem; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; background: rgba(255,255,255,.8); color: var(--b600);
+    border: 1px solid var(--b200); box-shadow: 0 2px 8px rgba(251,49,134,.08);
+    transition: transform .2s, background .2s, color .2s;
+  }
+  .social:hover { transform: translateY(-2px); background: var(--b500); color: #fff; }
+  .social svg { width: 1.25rem; height: 1.25rem; }
+  footer { margin-top: auto; padding-top: 3rem; font-size: .75rem; color: var(--b400); }
+</style>
+</head>
+<body>
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+
+  <main class="wrap">
+    <div class="avatar">🌸</div>
+    <h1>Pink Boutique</h1>
+    <p class="tagline">Soft things, bold vibes. 🌸 Our shop is launching soon — be the first to know.</p>
+
+    <div class="links">
+      <div class="pill disabled">
+        <span class="emoji">🛍️</span>
+        <span class="label">Shop the collection</span>
+        <span class="soon">soon</span>
+      </div>
+      <a class="pill" href="mailto:info@jiffys.info?subject=Notify%20me%20when%20Pink%20Boutique%20launches">
+        <span class="emoji">📬</span>
+        <span class="label">Get launch updates</span>
+      </a>
+    </div>
+
+    <div class="socials">
+      <a class="social" href="https://instagram.com/yourbrand" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a class="social" href="https://tiktok.com/@yourbrand" target="_blank" rel="noopener noreferrer" aria-label="TikTok" title="TikTok">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 0h-3.2v15.5a2.8 2.8 0 1 1-2.8-2.8c.3 0 .6 0 .9.1V9.5a6 6 0 1 0 5.1 6V7.6a7.3 7.3 0 0 0 4.3 1.4V5.8a4.3 4.3 0 0 1-4.3-4.3V0z"/></svg>
+      </a>
+      <a class="social" href="https://x.com/yourbrand" target="_blank" rel="noopener noreferrer" aria-label="X" title="X">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
+      </a>
+      <a class="social" href="mailto:info@jiffys.info" aria-label="Email" title="Email">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+      </a>
+    </div>
+
+    <footer>© <span id="y"></span> Pink Boutique · hello@jiffys.info</footer>
+  </main>
+  <script>document.getElementById("y").textContent = new Date().getFullYear();</script>
+</body>
+</html>
