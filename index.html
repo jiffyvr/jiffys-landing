@@ -3,106 +3,239 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Pink Boutique — launching soon</title>
-<meta name="description" content="Pink Boutique — soft things, bold vibes. Shop launching soon." />
+<title>Jiffy's &gt;.&lt;</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
-  :root {
-    --b50:#fff0f6; --b100:#ffdeec; --b200:#ffc2dc; --b300:#ff97c2;
-    --b400:#ff5fa2; --b500:#fb3186; --b600:#e60f6c; --b700:#c00658;
-    --b800:#9d0a4b; --b900:#820d42;
+  :root{
+    --bg:#fbe1e8; --bg2:#fcd3dd; --card:#fff6f8; --ink:#5a2740; --ink2:#9a6b7e;
+    --accent:#e0588f; --accent-d:#c23a72; --btn:#3a2230; --btn2:#7a4a3a;
+    --line:#eab9c8;
+    /* ═══════ EDIT SIZES HERE — change a number, save, refresh the page ═══════ */
+    --max:880px;        /* page content width */
+    --banner-h:150px;   /* banner height — a bigger number = a bigger cat */
+    --ticker-h:59px;    /* height of the scrolling offer strip */
+    --avatar:34px;      /* the little avatar in the top-left */
+    --btn-pad:15px;     /* button thickness (top & bottom padding) */
+    --btn-text:16px;    /* button text size */
+    --radius:14px;      /* corner roundness */
+    /* ════════════════════════════════════════════════════════════════════ */
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    min-height: 100vh; color: var(--b900);
-    background: linear-gradient(to bottom, var(--b100), var(--b50) 40%, #ffffff);
-    overflow-x: hidden;
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55}
+  a{color:inherit}
+  h1,h2,h3,.brand,.nav a,.acc summary{font-family:"Quicksand",sans-serif}
+
+  /* nav */
+  .nav{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:10px 20px;background:rgba(255,255,255,.72);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;color:var(--ink)}
+  .brand img{width:var(--avatar);height:var(--avatar);border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+  .nav nav{display:flex;gap:22px}
+  .nav nav a{text-decoration:none;font-weight:600;font-size:15px;color:var(--ink2);padding:4px 2px;border-bottom:2px solid transparent}
+  .nav nav a.active,.nav nav a:hover{color:var(--ink);border-color:var(--accent)}
+
+  /* banner */
+  .banner{position:relative;height:var(--banner-h);background:
+      radial-gradient(120% 90% at 80% 10%, #ffe9b0 0%, transparent 45%),
+      radial-gradient(120% 100% at 10% 90%, #ffd0e0 0%, transparent 50%),
+      linear-gradient(135deg,#ffe3ec,#ffd8c2);
+    display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .banner .sparkle{position:absolute;font-size:42px;opacity:.7}
+  .banner .s1{top:24px;left:10%}.banner .s2{bottom:30px;right:14%;font-size:30px}.banner .s3{top:40%;right:30%;font-size:22px}
+  .banner .ph{font-family:"Quicksand";font-weight:700;font-size:22px;color:#b9657f;background:rgba(255,255,255,.55);
+    padding:10px 18px;border-radius:999px;border:1px dashed #d98aa3}
+  .banner .sticker{position:absolute;bottom:14px;right:20px;width:112px;height:auto;filter:drop-shadow(0 5px 9px rgba(0,0,0,.18));animation:bob 3s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  .banner .bannerimg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;z-index:1}
+  /* offer ticker that streams along the bottom of the banner */
+  .bannermarq{position:absolute;left:0;right:0;bottom:0;height:var(--ticker-h);display:flex;align-items:center;z-index:3;
+    background:linear-gradient(transparent,rgba(251,225,232,.4))}
+  .bannermarq .adcard{display:flex;align-items:center;width:auto;min-width:196px;padding:8px 12px;gap:10px;margin-right:16px;background:rgba(255,255,255,.9)}
+  .bannermarq .adcard .thumb{width:46px;height:46px;border-radius:10px;font-size:25px;flex:none}
+  .bannermarq .adcard .meta{padding:0}
+  .bannermarq .adcard .d{display:none}
+  .banner .sparkle,.banner .ph{z-index:2}
+
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 18px}
+
+  /* buttons section */
+  .btnsec{margin:22px auto 0;position:relative;z-index:5;max-width:var(--max);padding:0 18px 8px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .block .btn{margin-bottom:6px}
+  .btn{display:block;width:100%;text-align:center;text-decoration:none;color:#fff;background:var(--btn);
+    padding:var(--btn-pad) 18px;border-radius:10px;font-weight:600;font-size:var(--btn-text);letter-spacing:.2px;
+    box-shadow:0 6px 16px rgba(58,34,48,.25);transition:transform .15s,box-shadow .15s,filter .15s}
+  .btn:hover{transform:translateY(-2px);filter:brightness(1.08);box-shadow:0 10px 22px rgba(58,34,48,.3)}
+  .btn.full{margin-top:18px;background:var(--btn2)}
+  .cap{text-align:center;font-size:13px;color:var(--ink2)}
+  .active{text-align:center;margin:22px 0 6px;font-weight:600}
+  .active b{color:var(--accent-d);border-bottom:2px solid var(--accent);padding-bottom:1px}
+
+  .div{border:0;border-top:2px dotted var(--line);margin:26px auto;max-width:var(--max)}
+
+  /* scrolling ads marquee */
+  .adhead{text-align:center;font-family:"Quicksand";font-weight:700;font-size:18px;color:var(--ink);margin:8px 0 14px}
+  .marquee{overflow:hidden;padding:4px 0 8px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+  .track{display:flex;width:max-content;animation:scroll 32s linear infinite}
+  .marquee:hover .track{animation-play-state:paused}
+  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .adcard{width:220px;flex:none;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;text-decoration:none;color:var(--ink);box-shadow:0 4px 14px rgba(90,39,64,.08);transition:transform .15s,box-shadow .15s}
+  .adcard:hover{transform:translateY(-4px);box-shadow:0 10px 22px rgba(90,39,64,.16)}
+  .adcard .thumb{height:118px;display:flex;align-items:center;justify-content:center;font-size:44px;background:linear-gradient(135deg,var(--bg2),#ffe6c6);overflow:hidden}
+  .adcard .thumb img{width:100%;height:100%;object-fit:cover}
+  .adcard .meta{padding:10px 12px}
+  .adcard .t{font-weight:700;font-size:15px}
+  .adcard .p{font-size:13px;color:var(--accent-d);font-weight:600;margin-top:1px}
+  .adcard .d{font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.4}
+
+  /* accordions */
+  .acc{max-width:var(--max);margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .acc summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;
+    padding:16px 20px;font-weight:700;font-size:16px;color:var(--ink)}
+  .acc summary::-webkit-details-marker{display:none}
+  .acc summary .chev{transition:transform .2s;color:var(--accent-d)}
+  .acc[open] summary .chev{transform:rotate(180deg)}
+  .acc .body{padding:4px 20px 18px;border-top:1px dashed var(--line)}
+  .linklist{list-style:none;display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .linklist a{display:flex;justify-content:space-between;text-decoration:none;background:#fff;border:1px solid var(--line);
+    border-radius:10px;padding:11px 14px;font-weight:600;color:var(--ink)}
+  .linklist a:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .qa{margin-top:12px}
+  .qa h4{font-weight:600;color:var(--ink);margin-bottom:2px}
+  .qa p{color:var(--ink2);margin-bottom:12px;font-size:15px}
+
+  /* legal + footer */
+  .legal{max-width:var(--max);margin:0 auto}
+  .legal h3{margin-bottom:8px}
+  .legal p{color:var(--ink2);font-size:14px;margin-bottom:8px}
+  footer{text-align:center;padding:30px 18px 40px;color:var(--ink2);font-size:13px}
+  .badge{display:inline-block;background:var(--accent);color:#fff;font-weight:700;border-radius:999px;padding:2px 10px;font-size:12px;margin-left:6px}
+
+  @media (max-width:560px){
+    .nav nav{gap:14px}.nav{padding:10px 14px}.brand{font-size:16px}
+    .banner{height:360px}.grid2{grid-template-columns:1fr}.btnsec{margin-top:14px}
   }
-  .blob { position: fixed; border-radius: 50%; filter: blur(64px); pointer-events: none; z-index: 0; }
-  .blob1 { width: 18rem; height: 18rem; background: rgba(255,151,194,.5); top: -6rem; left: -6rem; }
-  .blob2 { width: 18rem; height: 18rem; background: rgba(255,95,162,.3); top: 33%; right: -5rem; }
-  .blob3 { width: 16rem; height: 16rem; background: rgba(255,194,220,.5); bottom: 0; left: 25%; }
-  .wrap {
-    position: relative; z-index: 1; max-width: 480px; margin: 0 auto;
-    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
-    padding: 4rem 1.5rem 2rem;
-  }
-  .avatar {
-    width: 7rem; height: 7rem; border-radius: 50%; display: flex; align-items: center;
-    justify-content: center; font-size: 3rem;
-    background: linear-gradient(135deg, var(--b400), var(--b600));
-    box-shadow: 0 12px 30px rgba(251,49,134,.3); border: 4px solid #fff;
-  }
-  h1 { margin-top: 1.5rem; font-size: 1.6rem; font-weight: 700; letter-spacing: -.01em; color: var(--b900); }
-  .tagline { margin-top: .5rem; max-width: 20rem; text-align: center; font-size: .95rem; line-height: 1.5; color: rgba(192,6,88,.85); }
-  .links { margin-top: 2rem; width: 100%; display: flex; flex-direction: column; gap: 1rem; }
-  .pill {
-    display: flex; align-items: center; gap: .75rem; padding: 1rem 1.25rem;
-    border-radius: 1rem; border: 1px solid var(--b200); background: rgba(255,255,255,.8);
-    color: var(--b800); text-decoration: none; font-weight: 600;
-    box-shadow: 0 2px 8px rgba(251,49,134,.08); backdrop-filter: blur(6px);
-    transition: transform .2s, background .2s, color .2s, box-shadow .2s, border-color .2s;
-  }
-  .pill:hover { transform: translateY(-2px); background: var(--b500); color: #fff; border-color: var(--b400); box-shadow: 0 10px 24px rgba(251,49,134,.3); }
-  .pill .emoji { font-size: 1.25rem; }
-  .pill .label { flex: 1; text-align: center; }
-  .pill.disabled { opacity: .7; cursor: default; }
-  .pill.disabled:hover { transform: none; background: rgba(255,255,255,.8); color: var(--b800); border-color: var(--b200); box-shadow: 0 2px 8px rgba(251,49,134,.08); }
-  .pill .soon { font-size: .7rem; font-weight: 600; background: var(--b100); color: var(--b700); padding: .15rem .5rem; border-radius: 999px; }
-  .socials { margin-top: 2.5rem; display: flex; gap: 1rem; }
-  .social {
-    width: 2.75rem; height: 2.75rem; border-radius: 50%; display: flex; align-items: center;
-    justify-content: center; background: rgba(255,255,255,.8); color: var(--b600);
-    border: 1px solid var(--b200); box-shadow: 0 2px 8px rgba(251,49,134,.08);
-    transition: transform .2s, background .2s, color .2s;
-  }
-  .social:hover { transform: translateY(-2px); background: var(--b500); color: #fff; }
-  .social svg { width: 1.25rem; height: 1.25rem; }
-  footer { margin-top: auto; padding-top: 3rem; font-size: .75rem; color: var(--b400); }
 </style>
 </head>
 <body>
-  <div class="blob blob1"></div>
-  <div class="blob blob2"></div>
-  <div class="blob blob3"></div>
 
-  <main class="wrap">
-    <div class="avatar">🌸</div>
-    <h1>Pink Boutique</h1>
-    <p class="tagline">Soft things, bold vibes. 🌸 Our shop is launching soon — be the first to know.</p>
+  <header class="nav">
+    <div class="brand">
+      <img src="./sticker.gif" alt="" />
+      <span>Jiffy's &gt;.&lt;</span>
+    </div>
+    <nav>
+      <a href="#home" class="active">Home</a>
+      <a href="#links">All Links</a>
+      <a href="#legal">Legal</a>
+    </nav>
+  </header>
 
-    <div class="links">
-      <div class="pill disabled">
-        <span class="emoji">🛍️</span>
-        <span class="label">Shop the collection</span>
-        <span class="soon">soon</span>
+  <section id="home" class="banner">
+    <img class="bannerimg" src="./banner.png" alt="" onload="this.closest('.banner').querySelector('.ph').style.display='none'" onerror="this.remove()" />
+    <span class="sparkle s1">✨</span><span class="sparkle s2">🌸</span><span class="sparkle s3">⭐</span>
+    <span class="ph">Your banner image goes here — save it as banner.png</span>
+    <div class="marquee bannermarq"><div class="track" id="adtrack"></div></div>
+  </section>
+
+  <section class="btnsec">
+    <div class="grid2">
+      <div class="block">
+        <a class="btn" href="#" style="background:#1b1b1f">Fansly</a>
+        <p class="cap">Click to edit text</p>
       </div>
-      <a class="pill" href="mailto:info@jiffys.info?subject=Notify%20me%20when%20Pink%20Boutique%20launches">
-        <span class="emoji">📬</span>
-        <span class="label">Get launch updates</span>
-      </a>
+      <div class="block">
+        <a class="btn" href="#" style="background:#5865F2">Discord</a>
+        <p class="cap">Click to edit text</p>
+      </div>
     </div>
+    <a class="btn full" href="#" style="background:#7a4a3a">Twitter</a>
+    <p class="active">Current Active Socials: <b>Fansly / Discord</b></p>
+  </section>
 
-    <div class="socials">
-      <a class="social" href="https://instagram.com/yourbrand" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-      </a>
-      <a class="social" href="https://tiktok.com/@yourbrand" target="_blank" rel="noopener noreferrer" aria-label="TikTok" title="TikTok">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 0h-3.2v15.5a2.8 2.8 0 1 1-2.8-2.8c.3 0 .6 0 .9.1V9.5a6 6 0 1 0 5.1 6V7.6a7.3 7.3 0 0 0 4.3 1.4V5.8a4.3 4.3 0 0 1-4.3-4.3V0z"/></svg>
-      </a>
-      <a class="social" href="https://x.com/yourbrand" target="_blank" rel="noopener noreferrer" aria-label="X" title="X">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
-      </a>
-      <a class="social" href="mailto:info@jiffys.info" aria-label="Email" title="Email">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
-      </a>
-    </div>
+  <hr class="div" />
 
-    <footer>© <span id="y"></span> Pink Boutique · hello@jiffys.info</footer>
-  </main>
-  <script>document.getElementById("y").textContent = new Date().getFullYear();</script>
+  <section id="links" class="wrap">
+    <details class="acc" open>
+      <summary>Full Links <span class="chev">⌄</span></summary>
+      <div class="body">
+        <ul class="linklist">
+          <a href="#">Fansly <span>↗</span></a>
+          <a href="#">Discord <span>↗</span></a>
+          <a href="#">Twitter / X <span>↗</span></a>
+          <a href="#">Throne / Wishlist <span>↗</span></a>
+          <a href="#">Ko-fi <span>↗</span></a>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <hr class="div" />
+
+  <section class="wrap">
+    <details class="acc">
+      <summary>Questions n stuff <span class="chev">⌄</span></summary>
+      <div class="body">
+        <div class="qa">
+          <h4>Where can I find your content?</h4>
+          <p>Fansly is my main — link's up top. Discord for the community.</p>
+          <h4>Do you do commissions / requests?</h4>
+          <p>Edit this answer — placeholder text.</p>
+          <h4>How do I support you?</h4>
+          <p>Edit this answer — placeholder text.</p>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <hr class="div" />
+
+  <section id="legal" class="wrap legal">
+    <h3>Legal <span class="badge">18+</span></h3>
+    <p>This page and all linked content are intended for adults 18 years or older. By continuing you confirm you are of legal age in your jurisdiction.</p>
+    <p>All content is © Jiffy's &gt;.&lt;. Do not repost, redistribute, or share without permission. (Edit this section with your full terms / DMCA contact.)</p>
+  </section>
+
+  <footer>© <span id="y"></span> Jiffy's &gt;.&lt; · made with 🌸 <span class="badge">18+</span></footer>
+
+<script>
+  // lets the Site Builder live-update sizes/colors even across origins
+  addEventListener("message", e => { if (e.data && e.data.cssVar) document.documentElement.style.setProperty(e.data.cssVar, e.data.value); });
+  document.getElementById("y").textContent = new Date().getFullYear();
+
+  // scrolling ads — edit this list (icon can be an emoji OR an image URL)
+  const ads = [
+    {icon:"🎨", t:"Custom Art", p:"from $25", d:"Personalized pieces, your way", url:"#"},
+    {icon:"💌", t:"Commissions", p:"Open", d:"DM to book a slot", url:"#"},
+    {icon:"📞", t:"Video Calls", p:"1-on-1", d:"Book some time with me", url:"#"},
+    {icon:"👕", t:"Merch", p:"Shop", d:"Stickers, prints & more", url:"#"},
+    {icon:"⭐", t:"Shoutouts", p:"$10", d:"Personalized just for you", url:"#"},
+    {icon:"🎁", t:"Wishlist", p:"Throne", d:"Spoil me a little 🩷", url:"#"}
+  ];
+  const adCard = a => '<a class="adcard" href="'+a.url+'"><div class="thumb">'
+    + (/^(https?:|\/)/.test(a.icon) ? '<img src="'+a.icon+'" alt=""/>' : a.icon)
+    + '</div><div class="meta"><div class="t">'+a.t+'</div><div class="p">'+a.p+'</div><div class="d">'+a.d+'</div></div></a>';
+  (function buildTicker(){
+    const t = document.getElementById("adtrack");
+    const one = ads.map(adCard).join("");
+    t.innerHTML = one;                                   // render one set to measure it
+    const oneW = t.scrollWidth || 1;
+    const viewW = (t.closest(".marquee") || t.parentElement).offsetWidth;
+    const block = Math.max(1, Math.ceil((viewW + 100) / oneW)); // copies needed to overflow the screen
+    let html = ""; for (let i = 0; i < block * 2; i++) html += one; // 2 blocks; translateX(-50%) = exactly 1 block → seamless, gapless
+    t.innerHTML = html;
+  })();
+
+  // highlight nav on scroll
+  const sections = ["home","links","legal"].map(id=>document.getElementById(id));
+  const navlinks = [...document.querySelectorAll(".nav nav a")];
+  addEventListener("scroll",()=>{
+    let cur = sections[0].id;
+    for(const s of sections){ if(s.getBoundingClientRect().top <= 90) cur = s.id; }
+    navlinks.forEach(a=>a.classList.toggle("active", a.getAttribute("href")==="#"+cur));
+  });
+</script>
 </body>
 </html>
