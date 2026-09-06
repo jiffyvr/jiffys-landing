@@ -642,7 +642,18 @@ function updateAmountUI() {
     $('donateBtn').disabled = true;
   }
 }
-function onAmountInput() { resetNonce(); updateAmountUI(); }
+// Currency entry, ATM style: the field holds cents, so typing a digit
+// slides the decimal right (3.00 -> 30.00) and backspace slides it back.
+// Pasting "12.50" still lands on 12.50 because only the digits are read.
+function reformatAmount() {
+  const el = $('amount');
+  const digits = el.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '').slice(0, 8);
+  if (!digits) { el.value = ''; return; }
+  el.value = (parseInt(digits, 10) / 100).toFixed(2);
+  const end = el.value.length;
+  try { el.setSelectionRange(end, end); } catch (e) {}
+}
+function onAmountInput() { reformatAmount(); resetNonce(); updateAmountUI(); }
 $('amount').addEventListener('input', onAmountInput);
 $('name').addEventListener('input', resetNonce);
 $('msg').addEventListener('input', () => {
