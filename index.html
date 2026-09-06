@@ -135,7 +135,6 @@
   <section id="home" class="banner">
     <img class="bannerimg" src="./banner.png" alt="" onload="this.closest('.banner').querySelector('.ph').style.display='none'" onerror="this.remove()" />
     <span class="sparkle s1">✨</span><span class="sparkle s2">🌸</span><span class="sparkle s3">⭐</span>
-    <span class="ph">Your banner image goes here — save it as banner.png</span>
     <div class="marquee bannermarq"><div class="track" id="adtrack"></div></div>
   </section>
 
@@ -143,15 +142,13 @@
     <div class="grid2">
       <div class="block">
         <a class="btn" href="https://www.twitch.tv/JiffyVR" style="background:#9146FF">Twitch</a>
-        <p class="cap">Click to edit text</p>
       </div>
       <div class="block">
-        <a class="btn" href="#" style="background:#5865F2">Discord</a>
-        <p class="cap">Click to edit text</p>
+        <a class="btn" href="https://discord.gg/zpZB93x" style="background:#5865F2">Discord</a>
       </div>
     </div>
-    <a class="btn full" href="#" style="background:#7a4a3a">Twitter</a>
-    <p class="active">Current Active Socials: <b>Twitch / Discord</b></p>
+    <a class="btn full" href="https://kick.com/jiffyvr" style="background:#53fc18;color:#111">Kick</a>
+    <p class="active">Current Active Socials: <b>Twitch / Kick / Discord</b></p>
   </section>
 
   <hr class="div" />
@@ -162,10 +159,9 @@
       <div class="body">
         <ul class="linklist">
           <a href="https://www.twitch.tv/JiffyVR">Twitch <span>↗</span></a>
-          <a href="#">Discord <span>↗</span></a>
-          <a href="#">Twitter / X <span>↗</span></a>
-          <a href="#">Throne / Wishlist <span>↗</span></a>
-          <a href="#">Ko-fi <span>↗</span></a>
+          <a href="https://kick.com/jiffyvr">Kick <span>↗</span></a>
+          <a href="https://discord.gg/zpZB93x">Discord <span>↗</span></a>
+          <a href="/donate.html">Donate 💕 <span>↗</span></a>
         </ul>
       </div>
     </details>
@@ -181,9 +177,9 @@
           <h4>Where can I find your content?</h4>
           <p>Twitch is my main — link's up top. Discord for the community.</p>
           <h4>Do you do commissions / requests?</h4>
-          <p>Edit this answer — placeholder text.</p>
+          <p>DM me on Discord and ask — that's where all the booking happens.</p>
           <h4>How do I support you?</h4>
-          <p>Edit this answer — placeholder text.</p>
+          <p>The Donate 💕 page up top, or just hang out in the streams. Every bit helps!</p>
         </div>
       </div>
     </details>
@@ -194,7 +190,7 @@
   <section id="legal" class="wrap legal">
     <h3>Legal <span class="badge">18+</span></h3>
     <p>This page and all linked content are intended for adults 18 years or older. By continuing you confirm you are of legal age in your jurisdiction.</p>
-    <p>All content is © Jiffy's &gt;.&lt;. Do not repost, redistribute, or share without permission. (Edit this section with your full terms / DMCA contact.)</p>
+    <p>All content is © Jiffy's &gt;.&lt;. Do not repost, redistribute, or share without permission.</p>
   </section>
 
   <footer>© <span id="y"></span> Jiffy's &gt;.&lt; · made with 🌸 <span class="badge">18+</span></footer>
@@ -206,12 +202,10 @@
 
   // scrolling ads — edit this list (icon can be an emoji OR an image URL)
   const ads = [
-    {icon:"🎨", t:"Custom Art", p:"from $25", d:"Personalized pieces, your way", url:"#"},
-    {icon:"💌", t:"Commissions", p:"Open", d:"DM to book a slot", url:"#"},
-    {icon:"📞", t:"Video Calls", p:"1-on-1", d:"Book some time with me", url:"#"},
-    {icon:"👕", t:"Merch", p:"Shop", d:"Stickers, prints & more", url:"#"},
-    {icon:"⭐", t:"Shoutouts", p:"$10", d:"Personalized just for you", url:"#"},
-    {icon:"🎁", t:"Wishlist", p:"Throne", d:"Spoil me a little 🩷", url:"#"}
+    {icon:"💕", t:"Tip Jar", p:"Donate", d:"Pops up on stream with your name", url:"/donate.html"},
+    {icon:"🟣", t:"Twitch", p:"Live", d:"Come watch the chaos", url:"https://www.twitch.tv/JiffyVR"},
+    {icon:"🟢", t:"Kick", p:"Live", d:"Same chaos, other couch", url:"https://kick.com/jiffyvr"},
+    {icon:"💬", t:"Discord", p:"Join", d:"The community hangout", url:"https://discord.gg/zpZB93x"}
   ];
   const adCard = a => '<a class="adcard" href="'+a.url+'"><div class="thumb">'
     + (/^(https?:|\/)/.test(a.icon) ? '<img src="'+a.icon+'" alt=""/>' : a.icon)
