@@ -653,7 +653,15 @@ function reformatAmount() {
   const end = el.value.length;
   try { el.setSelectionRange(end, end); } catch (e) {}
 }
-function onAmountInput() { reformatAmount(); resetNonce(); updateAmountUI(); }
+function onAmountInput(ev) {
+  // Only reformat when the donor ADDS a digit — deleting is left alone so
+  // backspace edits the text normally instead of sliding the decimal back.
+  const deleting = !!(ev && typeof ev.inputType === 'string'
+                      && ev.inputType.indexOf('delete') === 0);
+  if (!deleting) reformatAmount();
+  resetNonce();
+  updateAmountUI();
+}
 $('amount').addEventListener('input', onAmountInput);
 $('name').addEventListener('input', resetNonce);
 $('msg').addEventListener('input', () => {
