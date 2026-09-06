@@ -671,13 +671,13 @@ function reformatAmount(inserted) {
     const dot = next.indexOf('.');
     if (dot !== -1) next = next.slice(0, dot + 3);      // 2 decimals max
   }
-  // refuse an edit that overshoots the cap - the old value stays put
+  // an edit that overshoots lands ON the cap rather than being refused:
+  // 60 + "0" gives 500, not a dead keystroke
   const cap = (typeof MAX_AMOUNT === 'number' && MAX_AMOUNT > 0) ? MAX_AMOUNT : 500;
   const val = amountOf(next);
   if (!isNaN(val) && val > cap) {
-    el.value = lastAmountValue;
+    next = (next.indexOf('.') !== -1) ? cap.toFixed(2) : String(cap);
     flashAmountCap(cap);
-    return;
   }
   el.value = next;
   const end = el.value.length;
