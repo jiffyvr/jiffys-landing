@@ -153,8 +153,8 @@
         <button class="tab" id="tabCrypto" role="tab" aria-selected="false" data-lane="crypto">🪙 Crypto</button>
       </div>
 
-      <!-- card lane -->
-      <div id="lane-card" hidden>
+      <!-- shared by both lanes: amount, name, message -->
+      <div id="shared-fields" hidden>
         <label for="amount">Amount</label>
         <div class="presets" id="presets"></div>
         <div class="amt">
@@ -170,6 +170,10 @@
         <label for="msg">Message <span class="lite" id="msgCount">0/200</span></label>
         <textarea class="txt" id="msg" maxlength="200" rows="2" placeholder="say something nice…"></textarea>
 
+      </div>
+
+      <!-- card lane -->
+      <div id="lane-card" hidden>
         <div id="eceWrap" hidden>
           <div id="ece"></div>
           <div class="ordiv"><span>or pay with card</span></div>
@@ -558,6 +562,7 @@ function buildForm(cfg, hasCard, hasCrypto, hasWallets, hasInvoice) {
   updateAmountUI();
 
   // lanes + tabs
+  $('shared-fields').hidden = !(hasCard || hasCrypto);
   $('lane-card').hidden = !hasCard;
   $('lane-crypto').hidden = true;
   $('tabs').hidden = !(hasCard && hasCrypto);
