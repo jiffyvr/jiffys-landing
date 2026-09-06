@@ -80,6 +80,12 @@
   .ghost:hover{border-color:var(--accent);color:var(--accent-d)}
   .spin{width:15px;height:15px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;display:inline-block;vertical-align:-2px;margin-right:8px;animation:whirl .8s linear infinite}
   .fine{font-size:12px;color:var(--ink2);text-align:center;margin-top:12px}
+  .ppbtn{display:flex;align-items:center;justify-content:center;width:100%;height:46px;
+    margin-top:12px;border-radius:12px;background:#FFC439;text-decoration:none;
+    font:700 18px/1 Verdana,Inter,sans-serif;font-style:italic}
+  .ppbtn:hover{filter:brightness(1.05)}
+  .pp1{color:#003087}.pp2{color:#009cde}
+  .pparrow{color:#003087;font-size:14px;font-style:normal}
   .cryptonote{color:var(--ink2);font-size:14px;margin-bottom:14px}
   .wallet{display:flex;gap:14px;align-items:center;border:1px solid var(--line);border-radius:12px;background:var(--field);padding:12px;margin-bottom:10px}
   .wallet canvas{flex:none;border-radius:8px;background:#fff;border:1px solid var(--line)}
@@ -155,6 +161,10 @@
         <div id="payment-element"></div>
         <p class="err" id="payErr" role="alert" aria-live="polite"></p>
         <button id="donateBtn" class="cta"><span class="spin" id="btnSpin" hidden></span><span id="btnLabel">Donate</span></button>
+        <a class="ppbtn" href="https://www.paypal.com/paypalme/jiffyvr" target="_blank" rel="noopener">
+          <span class="pp1">Pay</span><span class="pp2">Pal</span><span class="pparrow">&nbsp;↗</span>
+        </a>
+        <p class="fine">PayPal tips don't pop up on stream — drop a message there instead 💕</p>
       </div>
 
       <!-- crypto lane -->
