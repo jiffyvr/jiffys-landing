@@ -80,9 +80,11 @@
   .ghost:hover{border-color:var(--accent);color:var(--accent-d)}
   .spin{width:15px;height:15px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;display:inline-block;vertical-align:-2px;margin-right:8px;animation:whirl .8s linear infinite}
   .fine{font-size:12px;color:var(--ink2);text-align:center;margin-top:12px}
-  .ttshint{font-size:13px;color:var(--ink2);text-align:center;margin-top:10px;
-    opacity:.55;transition:all .25s}
-  .ttshint.on{opacity:1;color:#e6b94d;font-weight:700;transform:scale(1.04)}
+  .ttspill{display:inline-flex;align-items:center;border-radius:999px;
+    padding:9px 14px;font-weight:700;font-size:13px;color:var(--ink2);
+    border:1px dashed var(--line);opacity:.55;transition:all .25s;cursor:default}
+  .ttspill.on{opacity:1;color:#111;background:#e6b94d;border-color:#e6b94d;
+    transform:scale(1.06)}
 
   .cryptonote{color:var(--ink2);font-size:14px;margin-bottom:14px}
   .wallet{display:flex;gap:14px;align-items:center;border:1px solid var(--line);border-radius:12px;background:var(--field);padding:12px;margin-bottom:10px}
@@ -157,7 +159,6 @@
           <div class="ordiv"><span>or pay with card</span></div>
         </div>
         <div id="payment-element"></div>
-        <p class="ttshint" id="ttsHint">🔊 tips of $5+ get read out loud on stream</p>
         <p class="err" id="payErr" role="alert" aria-live="polite"></p>
         <button id="donateBtn" class="cta"><span class="spin" id="btnSpin" hidden></span><span id="btnLabel">Donate</span></button>
       </div>
@@ -483,8 +484,7 @@ async function init() {
   if (typeof cfg.max_amount === 'number' && cfg.max_amount > 0) MAX_AMOUNT = cfg.max_amount;
   const tm = Number(cfg.tts_min);
   if (tm > 0) { TTS_MIN = tm; }
-  const th = $('ttsHint');
-  if (th) th.textContent = '🔊 tips of ' + sym() + TTS_MIN + '+ get read out loud on stream';
+
 
   const stripeReady = !!(cfg.stripe_enabled && cfg.publishable_key && window.Stripe);
   if (stripeReady) {
@@ -522,7 +522,9 @@ function buildForm(cfg, hasCard, hasCrypto) {
     .filter(p => typeof p === 'number' && p >= (cfg.min_amount || 1) && p <= MAX_AMOUNT);
   amount = presets[0] || Math.max(cfg.min_amount || 1, 5);
   $('presets').innerHTML = presets.map(p =>
-    '<button type="button" class="chip" data-amt="' + p + '">' + sym() + p + '</button>').join('');
+    '<button type="button" class="chip" data-amt="' + p + '">' + sym() + p + '</button>').join('')
+    + '<span class="ttspill" id="ttsHint" title="tips of ' + sym() + TTS_MIN +
+      '+ get read out loud on stream">🔊 TTS</span>';
   $('presets').querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', () => {
     $('amount').value = Number(ch.dataset.amt).toFixed(2);
     onAmountInput();
