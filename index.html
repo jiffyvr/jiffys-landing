@@ -110,6 +110,8 @@
   #streamOpen:hover{filter:brightness(1.06)}
   @media (max-width:640px){ #streamOpen{font-size:12px;padding:6px 10px} }
   /* offer ticker that streams along the bottom of the banner */
+  .bannermarq{opacity:0;transition:opacity .2s ease}
+  .bannermarq.ready{opacity:1}
   .bannermarq{position:absolute;left:0;right:0;bottom:0;height:var(--ticker-h);display:flex;align-items:center;z-index:3;
     background:linear-gradient(transparent,rgba(251,225,232,.4))}
   .bannermarq .adcard{display:flex;align-items:center;width:auto;min-width:196px;padding:8px 12px;gap:10px;margin-right:16px;background:rgba(255,255,255,.9)}
@@ -170,9 +172,6 @@
   footer{text-align:center;padding:30px 18px 40px;color:var(--ink2);font-size:13px}
   .badge{display:inline-block;background:var(--accent);color:#fff;font-weight:700;border-radius:999px;padding:2px 10px;font-size:12px;margin-left:6px}
 
-  /* the offer ticker measures itself then re-renders, which flashes on a
-     desktop refresh - it only earns its place on narrow screens */
-  @media (min-width:561px){ .bannermarq{display:none} }
   @media (max-width:560px){
     .nav nav{gap:14px}.nav{padding:10px 14px}.brand{font-size:16px}
     .navleft{gap:8px}.installbtn{padding:7px 9px}.installbtn .txt{display:none}
@@ -290,7 +289,6 @@
     + (/^(https?:|\/)/.test(a.icon) ? '<img src="'+a.icon+'" alt=""/>' : a.icon)
     + '</div><div class="meta"><div class="t">'+a.t+'</div><div class="p">'+a.p+'</div><div class="d">'+a.d+'</div></div></a>';
   (function buildTicker(){
-    if (window.matchMedia("(min-width:561px)").matches) return;  // desktop: no ticker
     const t = document.getElementById("adtrack");
     const one = ads.map(adCard).join("");
     t.innerHTML = one;                                   // render one set to measure it
@@ -299,6 +297,10 @@
     const block = Math.max(1, Math.ceil((viewW + 100) / oneW)); // copies needed to overflow the screen
     let html = ""; for (let i = 0; i < block * 2; i++) html += one; // 2 blocks; translateX(-50%) = exactly 1 block → seamless, gapless
     t.innerHTML = html;
+    // reveal only now: the measure-then-refill pass above is what used to
+    // flash on a refresh, so it happens while the strip is still transparent
+    const marq = t.closest(".marquee");
+    if (marq) requestAnimationFrame(() => marq.classList.add("ready"));
   })();
 
   // LIVE pill — polls /live once at load then every 60s; silent + hidden on any failure
