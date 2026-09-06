@@ -86,7 +86,7 @@
     transition:all .25s;cursor:default;white-space:nowrap}
   .ttspill.on{opacity:1;color:#111;background:#e6b94d;border-color:#e6b94d;
     transform:scale(1.05)}
-  .ttspill{cursor:pointer}
+  .ttspill.on,.ttspill.off{cursor:pointer}
   .ttspill.off{opacity:.8;text-decoration:line-through}
 
   .cryptonote{color:var(--ink2);font-size:14px;margin-bottom:14px}
@@ -532,6 +532,7 @@ function buildForm(cfg, hasCard, hasCrypto) {
   if (th) {
     th.title = 'tips of ' + sym() + TTS_MIN + '+ get read out loud on stream — click to turn off for your tip';
     th.addEventListener('click', () => {
+      if (amount < TTS_MIN) return;   // dim badge is just an indicator
       ttsOptOut = !ttsOptOut;
       th.textContent = ttsOptOut ? '🔇 TTS off' : '🔊 TTS';
       th.classList.toggle('off', ttsOptOut);
@@ -611,7 +612,14 @@ function updateAmountUI() {
       ch.classList.toggle('sel', Number(ch.dataset.amt) === amount));
     $('btnLabel').textContent = paypalPicked ? 'Continue to PayPal ↗' : donateLabel();
     const hint = $('ttsHint');
-    if (hint) hint.classList.toggle('on', !ttsOptOut && amount >= TTS_MIN);
+    if (hint) {
+      if (amount < TTS_MIN && ttsOptOut) {
+        ttsOptOut = false;
+        hint.textContent = '🔊 TTS';
+        hint.classList.remove('off');
+      }
+      hint.classList.toggle('on', !ttsOptOut && amount >= TTS_MIN);
+    }
     $('donateBtn').disabled = busy;
     if (elements) { try { elements.update({ amount: minor(amount) }); } catch (e) {} }
   } else {
