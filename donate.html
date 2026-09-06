@@ -181,8 +181,15 @@
 
       <!-- crypto lane -->
       <div id="lane-crypto" hidden>
-        <p class="cryptonote">Send any amount to one of these wallets — it pops up on stream as Anonymous after a minute or two 💕</p>
-        <div id="wallets"></div>
+        <div id="invoiceBox" hidden>
+          <p class="cryptonote">Pay with any of 200+ coins — your name and message come along, same as a card tip 💕</p>
+          <p class="err" id="invoiceErr" role="alert" aria-live="polite"></p>
+          <button id="invoiceBtn" class="cta"><span class="spin" id="invSpin" hidden></span><span id="invLabel">Pay with crypto</span></button>
+        </div>
+        <div id="walletBox" hidden>
+          <p class="cryptonote">Or send straight to a wallet — it pops up on stream as Anonymous after a minute or two 💕</p>
+          <div id="wallets"></div>
+        </div>
       </div>
     </section>
 
@@ -506,9 +513,11 @@ async function init() {
   if (stripeReady) {
     try { stripe = Stripe(cfg.publishable_key); } catch (e) { stripe = null; }
   }
-  const cryptoReady = !!(cfg.crypto_enabled && Array.isArray(cfg.wallets) && cfg.wallets.length);
+  const hasWallets = !!(cfg.crypto_enabled && Array.isArray(cfg.wallets) && cfg.wallets.length);
+  const hasInvoice = !!cfg.nowpayments_enabled;
+  const cryptoReady = hasWallets || hasInvoice;
 
-  buildForm(cfg, !!stripe, cryptoReady);
+  buildForm(cfg, !!stripe, cryptoReady, hasWallets, hasInvoice);
 
   // Redirect-based payment methods land back here with the intent in the URL.
   const qp = new URLSearchParams(location.search);
@@ -530,7 +539,7 @@ async function init() {
 }
 
 /* ── form building ── */
-function buildForm(cfg, hasCard, hasCrypto) {
+function buildForm(cfg, hasCard, hasCrypto, hasWallets, hasInvoice) {
   $('curSym').textContent = sym();
 
   // presets
@@ -553,9 +562,11 @@ function buildForm(cfg, hasCard, hasCrypto) {
   $('lane-crypto').hidden = true;
   $('tabs').hidden = !(hasCard && hasCrypto);
   if (!hasCard && hasCrypto) $('lane-crypto').hidden = false;
+  $('invoiceBox').hidden = !hasInvoice;
+  $('walletBox').hidden = !hasWallets;
 
   // wallets
-  if (hasCrypto) {
+  if (hasWallets) {
     const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     $('wallets').innerHTML = cfg.wallets.map((w, i) => {
       const coin = esc(String(w.coin || '?').toUpperCase());
@@ -615,6 +626,8 @@ function updateAmountUI() {
     $('btnLabel').textContent = paypalPicked ? 'Continue to PayPal ↗' : donateLabel();
     const hint = $('ttsHint');
     if (hint) hint.classList.toggle('on', amount >= TTS_MIN);
+    const il = $('invLabel');
+    if (il) il.textContent = 'Pay ' + fmt(amount) + ' with crypto';
     $('donateBtn').disabled = busy;
     if (elements) { try { elements.update({ amount: minor(amount) }); } catch (e) {} }
   } else {
@@ -758,6 +771,44 @@ async function doPayment() {
   }
 }
 $('donateBtn').addEventListener('click', doPayment);
+
+let invBusy = false;
+async function payWithCrypto() {
+  if (invBusy) return;
+  const v = validateAmount();
+  if (!v.ok) { updateAmountUI(); return; }
+  invBusy = true;
+  $('invSpin').hidden = false;
+  $('invoiceBtn').disabled = true;
+  $('invoiceErr').textContent = '';
+  try {
+    const res = await fetch(API_BASE + '/invoice', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'omit',
+      body: JSON.stringify({
+        amount: v.value,
+        name: $('name').value.trim().slice(0, 40),
+        message: $('msg').value.trim().slice(0, 200),
+        nonce: getNonce()
+      })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.invoice_url) {
+      $('invoiceErr').textContent = data.error || 'Could not start the crypto checkout — try again in a moment.';
+      return;
+    }
+    resetNonce();               // a completed handoff must not reuse this one
+    location.href = data.invoice_url;
+  } catch (e) {
+    $('invoiceErr').textContent = 'Could not reach the tip jar — try again in a moment.';
+  } finally {
+    invBusy = false;
+    $('invSpin').hidden = true;
+    $('invoiceBtn').disabled = false;
+  }
+}
+$('invoiceBtn').addEventListener('click', payWithCrypto);
 
 function handleIntentState(status, intentId) {
   if (status === 'succeeded') { showThanks(); resetNonce(); }
