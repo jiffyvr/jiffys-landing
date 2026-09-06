@@ -614,7 +614,9 @@ document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () =>
 function validateAmount() {
   const raw = $('amount').value.trim().replace(/^\$/, '');
   const min = (CFG && CFG.min_amount) || 1;
-  if (!/^\d+(\.\d{1,2})?$/.test(raw)) return { ok: false, err: 'Enter an amount like 5 or 5.50 (up to 2 decimals).' };
+  // a trailing dot is a normal mid-edit state now that deletes are left raw
+  // ("30." on the way to "30.5"), so accept it rather than blocking checkout
+  if (!/^\d+\.?\d{0,2}$/.test(raw)) return { ok: false, err: 'Enter an amount like 5 or 5.50 (up to 2 decimals).' };
   const v = parseFloat(raw);
   if (v < min) return { ok: false, err: 'Minimum tip is ' + fmt(min) + '.' };
   if (v > MAX_AMOUNT) return { ok: false, err: 'Maximum tip is ' + fmt(MAX_AMOUNT) + ' — thank you though!! 💕' };
