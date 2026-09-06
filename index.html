@@ -73,11 +73,6 @@
   .bell.busy{opacity:.55;pointer-events:none}
   .bell[hidden]{display:none!important}
 
-  .installbtn{flex:none;display:inline-flex;align-items:center;gap:5px;padding:7px 11px;cursor:pointer;
-    border:1px dashed var(--accent);border-radius:999px;background:rgba(255,255,255,.75);color:var(--accent-d);
-    font-family:"Quicksand",sans-serif;font-weight:700;font-size:12px;line-height:1;transition:background .15s,color .15s}
-  .installbtn:hover{background:var(--accent);color:#fff;border-style:solid}
-  .installbtn[hidden]{display:none!important}
 
   .tip{position:absolute;top:calc(100% + 12px);left:0;z-index:40;width:max-content;max-width:min(330px,calc(100vw - 34px));
     display:flex;align-items:flex-start;gap:8px;padding:10px 12px;background:var(--card);border:1px solid var(--line);
@@ -174,7 +169,7 @@
 
   @media (max-width:560px){
     .nav nav{gap:14px}.nav{padding:10px 14px}.brand{font-size:16px}
-    .navleft{gap:8px}.installbtn{padding:7px 9px}.installbtn .txt{display:none}
+    .navleft{gap:8px}
     .banner{height:360px}.grid2{grid-template-columns:1fr}.btnsec{margin-top:14px}
   }
 </style>
@@ -191,10 +186,6 @@
           <path class="bellclap" d="M9.8 18.5a2.3 2.3 0 0 0 4.4 0"/>
           <path class="bellslash" d="M4.6 4.6 19.4 19.4"/>
         </svg>
-      </button>
-      <button id="installBtn" class="installbtn" type="button" hidden
-              aria-label="Add Jiffy's to your home screen" title="Add Jiffy's to your home screen">
-        <span aria-hidden="true">＋</span><span class="txt">Add to Home Screen</span>
       </button>
       <div class="brand">
         <img src="./sticker.gif" alt="" />
@@ -371,7 +362,6 @@
     const UNSUB_URL = API + "/push/unsubscribe";
 
     const bell       = document.getElementById("bellBtn");
-    const installBtn = document.getElementById("installBtn");
     const tip        = document.getElementById("iosTip");
     const tipMsg     = document.getElementById("tipMsg");
     const tipClose   = document.getElementById("iosTipClose");
@@ -538,6 +528,9 @@
         throw err;
       }
       setState("on");
+      // notifications survive a closed browser far better from an installed
+      // app, so this is the moment the offer actually makes sense
+      offerInstall();
     }
 
     async function turnOff(){
@@ -623,26 +616,19 @@
       }catch(e){}
     })();
 
-    // Android / desktop install affordance
+    // Installing is part of switching notifications on, not a separate
+    // button: the browser hands us the prompt whenever it likes, we hold it
+    // and offer it right after the bell succeeds.
     let deferredInstall = null;
-    addEventListener("beforeinstallprompt", e => {
-      e.preventDefault();
-      deferredInstall = e;
-      if(!installed()) installBtn.hidden = false;
-    });
-    installBtn.addEventListener("click", async () => {
+    addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferredInstall = e; });
+    addEventListener("appinstalled", () => { deferredInstall = null; });
+
+    async function offerInstall(){
       const p = deferredInstall;
+      if(!p || installed()) return;
       deferredInstall = null;
-      installBtn.hidden = true;
-      if(!p) return;
       try{ p.prompt(); await p.userChoice; }catch(e){}
-    });
-    addEventListener("appinstalled", () => { deferredInstall = null; installBtn.hidden = true; });
-    try{
-      window.matchMedia("(display-mode: standalone)").addEventListener("change", e => {
-        if(e.matches) installBtn.hidden = true;
-      });
-    }catch(e){}
+    }
 
     // register early so the app is installable even if the bell is never touched
     if(canPush) addEventListener("load", () => { swReg().catch(() => {}); });
