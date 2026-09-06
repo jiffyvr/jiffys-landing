@@ -80,12 +80,7 @@
   .ghost:hover{border-color:var(--accent);color:var(--accent-d)}
   .spin{width:15px;height:15px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;display:inline-block;vertical-align:-2px;margin-right:8px;animation:whirl .8s linear infinite}
   .fine{font-size:12px;color:var(--ink2);text-align:center;margin-top:12px}
-  .ppbtn{display:flex;align-items:center;justify-content:center;width:100%;height:46px;
-    margin-top:12px;border-radius:12px;background:#FFC439;text-decoration:none;
-    font:700 18px/1 Verdana,Inter,sans-serif;font-style:italic}
-  .ppbtn:hover{filter:brightness(1.05)}
-  .pp1{color:#003087}.pp2{color:#009cde}
-  .pparrow{color:#003087;font-size:14px;font-style:normal}
+
   .cryptonote{color:var(--ink2);font-size:14px;margin-bottom:14px}
   .wallet{display:flex;gap:14px;align-items:center;border:1px solid var(--line);border-radius:12px;background:var(--field);padding:12px;margin-bottom:10px}
   .wallet canvas{flex:none;border-radius:8px;background:#fff;border:1px solid var(--line)}
@@ -161,10 +156,6 @@
         <div id="payment-element"></div>
         <p class="err" id="payErr" role="alert" aria-live="polite"></p>
         <button id="donateBtn" class="cta"><span class="spin" id="btnSpin" hidden></span><span id="btnLabel">Donate</span></button>
-        <a class="ppbtn" href="https://www.paypal.com/paypalme/jiffyvr" target="_blank" rel="noopener">
-          <span class="pp1">Pay</span><span class="pp2">Pal</span><span class="pparrow">&nbsp;↗</span>
-        </a>
-        <p class="fine">PayPal tips don't pop up on stream — drop a message there instead 💕</p>
       </div>
 
       <!-- crypto lane -->
@@ -449,6 +440,11 @@ const CUR_SYM = { usd: '$', eur: '€', gbp: '£', cad: 'CA$', aud: 'A$' };
 const COIN_COLORS = { BTC: '#f7931a', ETH: '#627eea', LTC: '#345d9d', DOGE: '#c2a633', SOL: '#9945ff', XMR: '#f26822', USDT: '#26a17b', USDC: '#2775ca', BNB: '#f3ba2f', XRP: '#23292f' };
 
 let CFG = null;
+let paypalPicked = false;
+function donateLabel() {
+  const v = (typeof amount === 'number' && amount > 0) ? 'Donate ' + fmt(amount) + ' 💕' : 'Donate';
+  return v;
+}
 let stripe = null, elements = null, elementsMounted = false;
 let busy = false;
 let amount = 5;               // current valid amount (major units)
@@ -589,13 +585,13 @@ function updateAmountUI() {
     errEl.classList.remove('show');
     $('presets').querySelectorAll('.chip').forEach(ch =>
       ch.classList.toggle('sel', Number(ch.dataset.amt) === amount));
-    $('btnLabel').textContent = 'Donate ' + fmt(amount) + ' 💕';
+    $('btnLabel').textContent = paypalPicked ? 'Continue to PayPal ↗' : donateLabel();
     $('donateBtn').disabled = busy;
     if (elements) { try { elements.update({ amount: minor(amount) }); } catch (e) {} }
   } else {
     errEl.textContent = v.err;
     errEl.classList.add('show');
-    $('btnLabel').textContent = 'Donate';
+    $('btnLabel').textContent = paypalPicked ? 'Continue to PayPal ↗' : 'Donate';
     $('donateBtn').disabled = true;
   }
 }
@@ -631,6 +627,7 @@ function mountStripe() {
       mode: 'payment',
       amount: minor(amount),
       currency: (CFG.currency || 'usd').toLowerCase(),
+      externalPaymentMethodTypes: ['external_paypal'],
       appearance: stripeAppearance(),
       fonts: [{ cssSrc: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' }]
     });
@@ -648,6 +645,11 @@ function mountStripe() {
     // Card / everything else
     const pe = elements.create('payment', { layout: 'tabs' });
     pe.mount('#payment-element');
+    pe.on('change', ev => {
+      paypalPicked = !!(ev && ev.value && ev.value.type === 'external_paypal');
+      $('btnLabel').textContent = paypalPicked ? 'Continue to PayPal ↗'
+                                               : donateLabel();
+    });
     pe.on('loaderror', ev => showPayError((ev.error && ev.error.message) || 'Card form failed to load — try refreshing.'));
   } catch (e) {
     showPayError('Card payments could not start — try refreshing the page.');
@@ -669,6 +671,12 @@ function setBusy(b) {
 /* ── the payment flow ── */
 async function doPayment() {
   if (busy || !stripe || !elements) return;
+  if (paypalPicked) {
+    // external tile: hand off to PayPal; no Stripe intent involved
+    window.open('https://www.paypal.com/paypalme/jiffyvr', '_blank', 'noopener');
+    showPayError("Heads up: PayPal tips don't pop up on stream 💕");
+    return;
+  }
   const v = validateAmount();
   if (!v.ok) { updateAmountUI(); return; }
   setBusy(true);
