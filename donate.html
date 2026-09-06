@@ -556,9 +556,11 @@ function buildForm(cfg, hasCard, hasCrypto, hasWallets, hasInvoice) {
   if (th) th.title = 'tips of ' + sym() + TTS_MIN + '+ get read out loud on stream';
   $('presets').querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', () => {
     $('amount').value = Number(ch.dataset.amt).toFixed(2);
+    lastAmountValue = $('amount').value;
     onAmountInput();
   }));
   $('amount').value = amount.toFixed(2);
+  lastAmountValue = $('amount').value;
   updateAmountUI();
 
   // lanes + tabs
@@ -627,7 +629,7 @@ function updateAmountUI() {
   const errEl = $('amountErr');
   if (v.ok) {
     amount = v.value;
-    errEl.classList.remove('show');
+    if (!capFlashing) errEl.classList.remove('show');
     $('presets').querySelectorAll('.chip').forEach(ch =>
       ch.classList.toggle('sel', Number(ch.dataset.amt) === amount));
     $('btnLabel').textContent = paypalPicked ? 'Continue to PayPal ↗' : donateLabel();
@@ -638,29 +640,65 @@ function updateAmountUI() {
     $('donateBtn').disabled = busy;
     if (elements) { try { elements.update({ amount: minor(amount) }); } catch (e) {} }
   } else {
-    errEl.textContent = v.err;
-    errEl.classList.add('show');
+    if (!capFlashing) { errEl.textContent = v.err; errEl.classList.add('show'); }
     $('btnLabel').textContent = paypalPicked ? 'Continue to PayPal ↗' : 'Donate';
     $('donateBtn').disabled = true;
   }
 }
-// Currency entry, ATM style: the field holds cents, so typing a digit
-// slides the decimal right (3.00 -> 30.00) and backspace slides it back.
-// Pasting "12.50" still lands on 12.50 because only the digits are read.
-function reformatAmount() {
+// Amount entry. Two modes, decided by whether a decimal is already showing:
+//  - no decimal yet ("", "3", "30")  -> plain typing, so an empty box + "1"
+//    means one dollar, and the donor can still type "12.50" by hand
+//  - a decimal is showing ("3.00")   -> ATM style, each digit slides the
+//    decimal right (3.00 -> 30.00). Deleting never reformats.
+// Either way an edit that would exceed max_amount is refused outright rather
+// than accepted and then rejected at checkout.
+let lastAmountValue = '';
+function amountOf(text) {
+  const t = String(text).trim().replace(/^\$/, '');
+  return /^\d+\.?\d{0,2}$/.test(t) ? parseFloat(t) : NaN;
+}
+function reformatAmount(inserted) {
   const el = $('amount');
-  const digits = el.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '').slice(0, 8);
-  if (!digits) { el.value = ''; return; }
-  el.value = (parseInt(digits, 10) / 100).toFixed(2);
+  const prevHadDot = lastAmountValue.indexOf('.') !== -1;
+  let next;
+  if (prevHadDot && inserted && /^\d$/.test(inserted)) {
+    const digits = el.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '').slice(0, 8);
+    next = digits ? (parseInt(digits, 10) / 100).toFixed(2) : '';
+  } else {
+    next = el.value.replace(/[^\d.]/g, '');            // keep it numeric
+    const bits = next.split('.');
+    if (bits.length > 2) next = bits[0] + '.' + bits.slice(1).join('');
+    const dot = next.indexOf('.');
+    if (dot !== -1) next = next.slice(0, dot + 3);      // 2 decimals max
+  }
+  // refuse an edit that overshoots the cap - the old value stays put
+  const cap = (typeof MAX_AMOUNT === 'number' && MAX_AMOUNT > 0) ? MAX_AMOUNT : 500;
+  const val = amountOf(next);
+  if (!isNaN(val) && val > cap) {
+    el.value = lastAmountValue;
+    flashAmountCap(cap);
+    return;
+  }
+  el.value = next;
   const end = el.value.length;
   try { el.setSelectionRange(end, end); } catch (e) {}
 }
+let capFlashTimer = null;
+let capFlashing = false;   // keeps updateAmountUI from clobbering the notice
+function flashAmountCap(cap) {
+  const err = $('amountErr');
+  if (!err) return;
+  capFlashing = true;
+  err.textContent = 'Max tip is ' + fmt(cap) + ' — thank you though!! 💕';
+  err.classList.add('show');
+  clearTimeout(capFlashTimer);
+  capFlashTimer = setTimeout(() => { capFlashing = false; updateAmountUI(); }, 1800);
+}
 function onAmountInput(ev) {
-  // Only reformat when the donor ADDS a digit — deleting is left alone so
-  // backspace edits the text normally instead of sliding the decimal back.
   const deleting = !!(ev && typeof ev.inputType === 'string'
                       && ev.inputType.indexOf('delete') === 0);
-  if (!deleting) reformatAmount();
+  if (!deleting) reformatAmount(ev && ev.data);
+  lastAmountValue = $('amount').value;
   resetNonce();
   updateAmountUI();
 }
