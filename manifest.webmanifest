@@ -1,0 +1,31 @@
+{
+  "id": "/",
+  "name": "Jiffy's >.<",
+  "short_name": "Jiffy's",
+  "description": "Jiffy's links, streams and tip jar - get a ping the moment the stream goes live.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fbe1e8",
+  "theme_color": "#e0588f",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

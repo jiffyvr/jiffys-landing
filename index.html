@@ -6,6 +6,12 @@
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#e0588f" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Jiffy's" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <title>Jiffy's &gt;.&lt;</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -33,8 +39,10 @@
   /* nav */
   .nav{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:16px;
     padding:10px 20px;background:rgba(255,255,255,.72);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .navleft{position:relative;display:flex;align-items:center;gap:10px;min-width:0}
   .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;color:var(--ink)}
   .brand img{width:var(--avatar);height:var(--avatar);border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+  .brand span{white-space:nowrap}
   .nav nav{display:flex;gap:22px}
   .nav nav a{text-decoration:none;font-weight:600;font-size:15px;color:var(--ink2);padding:4px 2px;border-bottom:2px solid transparent}
   .nav nav a.active,.nav nav a:hover{color:var(--ink);border-color:var(--accent)}
@@ -46,6 +54,39 @@
   .livepill .livedot{width:7px;height:7px;border-radius:50%;background:#fff;flex:none;animation:livepulse 1.6s ease-in-out infinite}
   @keyframes livepulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.75)}}
   .livepill[hidden]{display:none!important}
+
+  /* notification bell (top-left) + install affordance + iOS tip */
+  .bell{flex:none;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;
+    border:1px solid var(--line);border-radius:50%;background:#fff;color:var(--accent-d);cursor:pointer;
+    box-shadow:0 1px 4px rgba(90,39,64,.12);transition:background .15s,color .15s,border-color .15s,transform .15s,box-shadow .15s}
+  .bell:hover{transform:translateY(-1px);border-color:var(--accent);box-shadow:0 3px 10px rgba(224,88,143,.25)}
+  .bell:focus-visible{outline:2px solid var(--accent-d);outline-offset:2px}
+  .bell svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .bell .bellslash{display:none}
+  .bell.on{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 12px rgba(224,88,143,.45)}
+  .bell.on .bellbody{fill:currentColor}
+  .bell.on svg{animation:bellring .55s ease-in-out}
+  @keyframes bellring{0%,100%{transform:rotate(0)}20%{transform:rotate(13deg)}45%{transform:rotate(-10deg)}70%{transform:rotate(6deg)}}
+  .bell.denied{color:#c7a8b5;border-color:var(--line);background:#fff;box-shadow:none}
+  .bell.denied:hover{transform:none;border-color:var(--line);box-shadow:none}
+  .bell.denied .bellslash{display:block}
+  .bell.busy{opacity:.55;pointer-events:none}
+  .bell[hidden]{display:none!important}
+
+  .installbtn{flex:none;display:inline-flex;align-items:center;gap:5px;padding:7px 11px;cursor:pointer;
+    border:1px dashed var(--accent);border-radius:999px;background:rgba(255,255,255,.75);color:var(--accent-d);
+    font-family:"Quicksand",sans-serif;font-weight:700;font-size:12px;line-height:1;transition:background .15s,color .15s}
+  .installbtn:hover{background:var(--accent);color:#fff;border-style:solid}
+  .installbtn[hidden]{display:none!important}
+
+  .tip{position:absolute;top:calc(100% + 12px);left:0;z-index:40;width:max-content;max-width:min(330px,calc(100vw - 34px));
+    display:flex;align-items:flex-start;gap:8px;padding:10px 12px;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;font-size:13px;line-height:1.45;color:var(--ink);box-shadow:0 10px 24px rgba(90,39,64,.18)}
+  .tip::before{content:"";position:absolute;top:-6px;left:12px;width:10px;height:10px;background:var(--card);
+    border-left:1px solid var(--line);border-top:1px solid var(--line);transform:rotate(45deg)}
+  .tip[hidden]{display:none!important}
+  .tipx{flex:none;border:0;background:transparent;color:var(--ink2);font-size:17px;line-height:1;cursor:pointer;padding:0 2px}
+  .tipx:hover{color:var(--accent-d)}
 
   /* banner */
   .banner{position:relative;height:var(--banner-h);background:
@@ -123,6 +164,7 @@
 
   @media (max-width:560px){
     .nav nav{gap:14px}.nav{padding:10px 14px}.brand{font-size:16px}
+    .navleft{gap:8px}.installbtn{padding:7px 9px}.installbtn .txt{display:none}
     .banner{height:360px}.grid2{grid-template-columns:1fr}.btnsec{margin-top:14px}
   }
 </style>
@@ -130,9 +172,28 @@
 <body>
 
   <header class="nav">
-    <div class="brand">
-      <img src="./sticker.gif" alt="" />
-      <span>Jiffy's &gt;.&lt;</span>
+    <div class="navleft">
+      <button id="bellBtn" class="bell" type="button" hidden
+              aria-label="Get a notification when the stream goes live"
+              title="Get a notification when the stream goes live" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path class="bellbody" d="M12 3.4A5.6 5.6 0 0 0 6.4 9v3.1c0 .5-.18.99-.5 1.37L4.5 15.1a.6.6 0 0 0 .46.99h14.08a.6.6 0 0 0 .46-.99l-1.4-1.63a2.1 2.1 0 0 1-.5-1.37V9A5.6 5.6 0 0 0 12 3.4Z"/>
+          <path class="bellclap" d="M9.8 18.5a2.3 2.3 0 0 0 4.4 0"/>
+          <path class="bellslash" d="M4.6 4.6 19.4 19.4"/>
+        </svg>
+      </button>
+      <button id="installBtn" class="installbtn" type="button" hidden
+              aria-label="Add Jiffy's to your home screen" title="Add Jiffy's to your home screen">
+        <span aria-hidden="true">＋</span><span class="txt">Add to Home Screen</span>
+      </button>
+      <div class="brand">
+        <img src="./sticker.gif" alt="" />
+        <span>Jiffy's &gt;.&lt;</span>
+      </div>
+      <div id="iosTip" class="tip" role="status" hidden>
+        <span id="tipMsg">On iPhone: tap Share <span aria-hidden="true">→</span> Add to Home Screen first, then tap the bell 💕</span>
+        <button type="button" class="tipx" id="iosTipClose" aria-label="Dismiss this tip">×</button>
+      </div>
     </div>
     <nav>
       <a href="#home" class="active">Home</a>
@@ -142,7 +203,7 @@
   </header>
 
   <section id="home" class="banner">
-    <img class="bannerimg" src="./banner.png" alt="" onload="this.closest('.banner').querySelector('.ph').style.display='none'" onerror="this.remove()" />
+    <img class="bannerimg" src="./banner.png" alt="" onload="var p=this.closest('.banner').querySelector('.ph'); if(p) p.style.display='none'" onerror="this.remove()" />
     <span class="sparkle s1">✨</span><span class="sparkle s2">🌸</span><span class="sparkle s3">⭐</span>
     <div class="marquee bannermarq"><div class="track" id="adtrack"></div></div>
   </section>
@@ -246,6 +307,293 @@
     }
     checkLive();
     setInterval(checkLive, 60000);
+  })();
+
+  // ── PWA + live-notification bell (top-left). Every path here fails silent: ──
+  // if anything is missing or unreachable the bell just hides and the rest of
+  // the page (LIVE pill, ticker, links) carries on exactly as before.
+  (function(){
+    const API       = "https://jiffys-api.tail1d1f7b.ts.net:10000";
+    const KEY_URL   = API + "/push/key";
+    const SUB_URL   = API + "/push/subscribe";
+    const UNSUB_URL = API + "/push/unsubscribe";
+
+    const bell       = document.getElementById("bellBtn");
+    const installBtn = document.getElementById("installBtn");
+    const tip        = document.getElementById("iosTip");
+    const tipMsg     = document.getElementById("tipMsg");
+    const tipClose   = document.getElementById("iosTipClose");
+    if(!bell) return;
+
+    const TIP_IOS    = tipMsg ? tipMsg.textContent : "";
+    const TIP_DENIED = "Notifications are blocked for this site — switch them back on in your browser's site settings 💕";
+    const TIP_RETRY  = "Couldn't reach the notification service just now — try again in a bit 💕";
+    const TIP_MUTED  = "Live pings are switched off at the moment — check back soon 💕";
+    function showTip(msg){
+      if(!tip) return;
+      if(tipMsg && msg) tipMsg.textContent = msg;
+      tip.hidden = false;
+    }
+
+    const mq = q => { try{ return !!(window.matchMedia && window.matchMedia(q).matches); }catch(e){ return false; } };
+    const ua = navigator.userAgent || "";
+    const isiOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const installed = () => mq("(display-mode: standalone)") || navigator.standalone === true;
+    const canPush = ("serviceWorker" in navigator) && ("PushManager" in window) &&
+                    ("Notification" in window) && window.isSecureContext === true;
+    // iOS only exposes web push once the site has been added to the Home Screen.
+    const iosNeedsInstall = isiOS && !installed() && !canPush;
+
+    const hideBell = () => { bell.hidden = true; if(tip) tip.hidden = true; };
+    if(!canPush && !iosNeedsInstall){ hideBell(); }
+    else { bell.hidden = false; }
+
+    let state = "off";                          // off | on | denied | muted
+    function setState(s){
+      state = s;
+      bell.classList.toggle("on", s === "on");
+      bell.classList.toggle("denied", s === "denied" || s === "muted");
+      bell.setAttribute("aria-pressed", s === "on" ? "true" : "false");
+      const label = s === "on"     ? "Live notifications are on — tap to turn them off"
+                  : s === "denied" ? "Notifications are blocked in your browser settings"
+                  : s === "muted"  ? "Live notifications are switched off right now"
+                  :                  "Get a notification when the stream goes live";
+      bell.setAttribute("aria-label", label);
+      bell.setAttribute("title", label);
+    }
+    const busy = b => bell.classList.toggle("busy", !!b);
+
+    function b64ToBytes(b64){
+      const pad = "=".repeat((4 - (b64.length % 4)) % 4);
+      const raw = atob((b64 + pad).replace(/-/g, "+").replace(/_/g, "/"));
+      const out = new Uint8Array(raw.length);
+      for(let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
+      return out;
+    }
+    function bytesToB64(buf){
+      const b = new Uint8Array(buf); let s = "";
+      for(let i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
+      return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    }
+    // which application-server key an existing subscription was made with
+    // ("" when the browser doesn't expose it — then we can't compare)
+    function subKey(sub){
+      try{
+        const k = sub && sub.options && sub.options.applicationServerKey;
+        return k ? bytesToB64(k) : "";
+      }catch(e){ return ""; }
+    }
+
+    // two kinds of failure, and only ONE of them may hide the bell:
+    //   "off"       — push is genuinely unavailable/disabled here
+    //   "transient" — the backend is asleep (this PC is off most of the day)
+    function fail(kind, msg){ const e = new Error(msg || kind); e.kind = kind; return e; }
+
+    async function req(url, opts){
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 8000);
+      try{
+        return await fetch(url, Object.assign({ signal: ctrl.signal, credentials: "omit", mode: "cors" }, opts || {}));
+      } finally { clearTimeout(timer); }
+    }
+
+    let cachedKey = null;
+    async function getKey(){
+      if(cachedKey) return cachedKey;
+      let r;
+      try{ r = await req(KEY_URL, { headers: { "Accept": "application/json" } }); }
+      catch(e){ throw fail("transient", "key unreachable"); }      // backend asleep
+      if(!r.ok) throw fail("transient", "key " + r.status);
+      const txt = ((await r.text()) || "").trim();
+      let k = "", enabled = true;
+      try{
+        const j = JSON.parse(txt);
+        k = (j && (j.key || j.publicKey || j.public_key || j.vapidPublicKey)) || "";
+        if(j && j.enabled === false) enabled = false;
+      }catch(e){ k = txt.replace(/^"|"$/g, ""); }
+      // the server telling us push is off is a DEFINITIVE answer: taking a
+      // subscription now would light the bell green over a dead pipe
+      if(!enabled) throw fail("off", "push disabled server-side");
+      k = String(k || "").trim();
+      if(!/^[A-Za-z0-9_-]{40,}$/.test(k)) throw fail("off", "no application-server key");
+      cachedKey = k;
+      return k;
+    }
+
+    async function post(url, body){
+      let r;
+      try{
+        r = await req(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+      }catch(e){ throw fail("transient", "post unreachable"); }
+      if(r.status === 503) throw fail("off", "push disabled server-side");
+      if(!r.ok) throw fail(r.status >= 500 || r.status === 429 ? "transient" : "off",
+                           "post " + r.status);
+      return r;
+    }
+
+    let regPromise = null;
+    function swReg(){
+      if(!regPromise){
+        regPromise = navigator.serviceWorker.register("/sw.js", { scope: "/" });
+        regPromise.catch(() => { regPromise = null; });   // let a later click retry
+      }
+      return regPromise;
+    }
+
+    // permPromise is started inside the click handler: browsers only honour
+    // requestPermission() while the user gesture is still fresh, so it must not
+    // wait behind the network round-trip.
+    async function turnOn(permPromise){
+      const keyPromise = getKey();                                    // in flight while the prompt is up
+      keyPromise.catch(() => {});
+      const perm = await permPromise;
+      if(perm !== "granted"){ setState(perm === "denied" ? "denied" : "off"); return; }
+
+      const key = await keyPromise;                                   // network — failure hides the bell
+      const reg = await swReg();
+      // never let a worker that refuses to activate leave the bell spinning
+      try{ await Promise.race([navigator.serviceWorker.ready, new Promise(r => setTimeout(r, 10000))]); }catch(e){}
+
+      const opts = { userVisibleOnly: true, applicationServerKey: b64ToBytes(key) };
+      let sub = null;
+      try{
+        sub = await reg.pushManager.getSubscription();
+        // a subscription made with a DIFFERENT application-server key is
+        // undeliverable (the push service answers 401/403 forever), so it
+        // is replaced rather than re-registered
+        if(sub && subKey(sub) && subKey(sub) !== key){
+          await sub.unsubscribe();
+          sub = null;
+        }
+        if(!sub) sub = await reg.pushManager.subscribe(opts);
+      }catch(e){
+        try{                                                          // stale sub from a rotated VAPID key
+          const stale = await reg.pushManager.getSubscription();
+          if(stale) await stale.unsubscribe();
+          sub = await reg.pushManager.subscribe(opts);
+        }catch(e2){ setState("off"); return; }
+      }
+      if(!sub){ setState("off"); return; }
+
+      try{
+        await post(SUB_URL, sub.toJSON());
+      }catch(err){
+        try{ await sub.unsubscribe(); }catch(e){}                     // don't leave a sub the server never saw
+        throw err;
+      }
+      setState("on");
+    }
+
+    async function turnOff(){
+      const reg = await swReg();
+      const sub = await reg.pushManager.getSubscription();
+      if(sub){
+        try{ await post(UNSUB_URL, sub.toJSON()); }catch(e){}         // best effort
+        try{ await sub.unsubscribe(); }catch(e){}
+      }
+      setState("off");
+    }
+
+    bell.addEventListener("click", async function(){
+      if(iosNeedsInstall){                                            // web push needs the Home Screen app on iOS
+        if(tip && !tip.hidden) tip.hidden = true; else showTip(TIP_IOS);
+        return;
+      }
+      if(state === "denied"){                                         // browser-level block; nothing we can do
+        if(tip && !tip.hidden) tip.hidden = true; else showTip(TIP_DENIED);
+        return;
+      }
+      if(state === "muted"){                                          // the streamer has push switched off
+        if(tip && !tip.hidden) tip.hidden = true; else showTip(TIP_MUTED);
+        return;
+      }
+      if(tip) tip.hidden = true;
+      busy(true);
+      try{
+        // requestPermission() is called here, still inside the user gesture
+        if(state === "on") await turnOff(); else await turnOn(Notification.requestPermission());
+      }catch(e){
+        // The backend is offline whenever Stream Ultimate is not running,
+        // which is most of the day: that is a "try again later", NOT a
+        // reason to take the bell away for good.
+        if(e && e.kind === "off"){ cachedKey = null; setState("muted"); }
+        else { showTip(TIP_RETRY); }
+      }
+      finally{ busy(false); }
+    });
+
+    if(tipClose) tipClose.addEventListener("click", () => { tip.hidden = true; });
+    addEventListener("keydown", e => { if(e.key === "Escape" && tip && !tip.hidden) tip.hidden = true; });
+
+    // Reflect current state on load — and re-sync with the server, because a
+    // subscription living only in the browser is a bell that says "on" while
+    // nothing can ever be delivered: the server may have lost the row (store
+    // reset, restore from backup) or rotated its VAPID key underneath us.
+    (async function(){
+      if(!canPush) return;
+      try{
+        if(Notification.permission === "denied"){ setState("denied"); return; }
+        const reg = await swReg();
+        const sub = reg && reg.pushManager ? await reg.pushManager.getSubscription() : null;
+        if(!sub){ setState("off"); return; }
+
+        let key = null;
+        try{ key = await getKey(); }
+        catch(e){
+          // backend unreachable -> trust what the browser holds; disabled
+          // server-side -> say so instead of promising pings
+          if(e && e.kind === "off"){ setState("muted"); } else { setState("on"); }
+          return;
+        }
+
+        const mine = subKey(sub);
+        if(mine && mine !== key){
+          // made for a previous application-server key: dead on arrival
+          try{
+            await sub.unsubscribe();
+            const fresh = await reg.pushManager.subscribe({
+              userVisibleOnly: true, applicationServerKey: b64ToBytes(key)
+            });
+            await post(SUB_URL, fresh.toJSON());
+            setState("on");
+          }catch(e2){ setState("off"); }
+          return;
+        }
+
+        setState("on");
+        // idempotent: PushStore.add dedupes by endpoint, so this costs one
+        // POST per page load and repairs any server-side loss for free
+        try{ await post(SUB_URL, sub.toJSON()); }catch(e3){}
+      }catch(e){}
+    })();
+
+    // Android / desktop install affordance
+    let deferredInstall = null;
+    addEventListener("beforeinstallprompt", e => {
+      e.preventDefault();
+      deferredInstall = e;
+      if(!installed()) installBtn.hidden = false;
+    });
+    installBtn.addEventListener("click", async () => {
+      const p = deferredInstall;
+      deferredInstall = null;
+      installBtn.hidden = true;
+      if(!p) return;
+      try{ p.prompt(); await p.userChoice; }catch(e){}
+    });
+    addEventListener("appinstalled", () => { deferredInstall = null; installBtn.hidden = true; });
+    try{
+      window.matchMedia("(display-mode: standalone)").addEventListener("change", e => {
+        if(e.matches) installBtn.hidden = true;
+      });
+    }catch(e){}
+
+    // register early so the app is installable even if the bell is never touched
+    if(canPush) addEventListener("load", () => { swReg().catch(() => {}); });
   })();
 
   // highlight nav on scroll
