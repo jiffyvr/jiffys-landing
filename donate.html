@@ -159,7 +159,7 @@
 
       <!-- crypto lane -->
       <div id="lane-crypto" hidden>
-        <p class="cryptonote">Send any amount to one of these wallets, then drop your name in chat so I can thank you! 💕</p>
+        <p class="cryptonote">Send any amount to one of these wallets — it pops up on stream as Anonymous after a minute or two 💕</p>
         <div id="wallets"></div>
       </div>
     </section>
@@ -192,7 +192,7 @@
 'use strict';
 
 /* ════════════════════════ API base ════════════════════════ */
-const API = 'https://desktop-uaokr6d.tail1d1f7b.ts.net:10000/donate-api';
+const API = 'https://jiffys-api.tail1d1f7b.ts.net:10000/donate-api';
 // Local preview only: on localhost, ?api=http://127.0.0.1:PORT points at a dev/mock
 // backend. Ignored everywhere else, so the deployed page always uses API above.
 const _apiOverride = new URLSearchParams(location.search).get('api');
