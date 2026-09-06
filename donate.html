@@ -671,12 +671,25 @@ function reformatAmount(inserted) {
     const dot = next.indexOf('.');
     if (dot !== -1) next = next.slice(0, dot + 3);      // 2 decimals max
   }
-  // an edit that overshoots lands ON the cap rather than being refused:
-  // 60 + "0" gives 500, not a dead keystroke
+  // Overshooting the cap has two outcomes, decided by how far it overshot:
+  //   same digit count as the cap (51 -> 510)  => clamp to the cap, they were
+  //                                               reaching for a big tip
+  //   a whole digit further (490 -> 4900)      => refuse the keystroke, that
+  //                                               is a slip, and silently
+  //                                               "correcting" it to 500 would
+  //                                               be a number they never typed
   const cap = (typeof MAX_AMOUNT === 'number' && MAX_AMOUNT > 0) ? MAX_AMOUNT : 500;
   const val = amountOf(next);
   if (!isNaN(val) && val > cap) {
-    next = (next.indexOf('.') !== -1) ? cap.toFixed(2) : String(cap);
+    const capDigits = String(Math.floor(cap)).length;
+    const valDigits = String(Math.floor(val)).length;
+    if (valDigits === capDigits) {
+      next = (next.indexOf('.') !== -1) ? cap.toFixed(2) : String(cap);
+    } else {
+      el.value = lastAmountValue;
+      flashAmountCap(cap);
+      return;
+    }
     flashAmountCap(cap);
   }
   el.value = next;
