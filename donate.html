@@ -659,9 +659,11 @@ function amountOf(text) {
 }
 function reformatAmount(inserted) {
   const el = $('amount');
-  const prevHadDot = lastAmountValue.indexOf('.') !== -1;
+  // Slide only from a COMPLETE amount ("3.00"). A half-typed "500." or
+  // "500.1" means the donor is entering decimals by hand, so leave it alone.
+  const prevComplete = /\.\d{2}$/.test(lastAmountValue);
   let next;
-  if (prevHadDot && inserted && /^\d$/.test(inserted)) {
+  if (prevComplete && inserted && /^\d$/.test(inserted)) {
     const digits = el.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '').slice(0, 8);
     next = digits ? (parseInt(digits, 10) / 100).toFixed(2) : '';
   } else {
