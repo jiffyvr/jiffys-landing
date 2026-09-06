@@ -86,8 +86,7 @@
     transition:all .25s;cursor:default;white-space:nowrap}
   .ttspill.on{opacity:1;color:#111;background:#e6b94d;border-color:#e6b94d;
     transform:scale(1.05)}
-  .ttspill.on,.ttspill.off{cursor:pointer}
-  .ttspill.off{opacity:.8;text-decoration:line-through}
+
 
   .cryptonote{color:var(--ink2);font-size:14px;margin-bottom:14px}
   .wallet{display:flex;gap:14px;align-items:center;border:1px solid var(--line);border-radius:12px;background:var(--field);padding:12px;margin-bottom:10px}
@@ -451,7 +450,6 @@ const COIN_COLORS = { BTC: '#f7931a', ETH: '#627eea', LTC: '#345d9d', DOGE: '#c2
 let CFG = null;
 let paypalPicked = false;
 let TTS_MIN = 5;
-let ttsOptOut = false;
 function donateLabel() {
   const v = (typeof amount === 'number' && amount > 0) ? 'Donate ' + fmt(amount) + ' 💕' : 'Donate';
   return v;
@@ -529,16 +527,7 @@ function buildForm(cfg, hasCard, hasCrypto) {
   $('presets').innerHTML = presets.map(p =>
     '<button type="button" class="chip" data-amt="' + p + '">' + sym() + p + '</button>').join('');
   const th = $('ttsHint');
-  if (th) {
-    th.title = 'tips of ' + sym() + TTS_MIN + '+ get read out loud on stream — click to turn off for your tip';
-    th.addEventListener('click', () => {
-      if (amount < TTS_MIN) return;   // dim badge is just an indicator
-      ttsOptOut = !ttsOptOut;
-      th.textContent = ttsOptOut ? '🔇 TTS off' : '🔊 TTS';
-      th.classList.toggle('off', ttsOptOut);
-      updateAmountUI();
-    });
-  }
+  if (th) th.title = 'tips of ' + sym() + TTS_MIN + '+ get read out loud on stream';
   $('presets').querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', () => {
     $('amount').value = Number(ch.dataset.amt).toFixed(2);
     onAmountInput();
@@ -612,14 +601,7 @@ function updateAmountUI() {
       ch.classList.toggle('sel', Number(ch.dataset.amt) === amount));
     $('btnLabel').textContent = paypalPicked ? 'Continue to PayPal ↗' : donateLabel();
     const hint = $('ttsHint');
-    if (hint) {
-      if (amount < TTS_MIN && ttsOptOut) {
-        ttsOptOut = false;
-        hint.textContent = '🔊 TTS';
-        hint.classList.remove('off');
-      }
-      hint.classList.toggle('on', !ttsOptOut && amount >= TTS_MIN);
-    }
+    if (hint) hint.classList.toggle('on', amount >= TTS_MIN);
     $('donateBtn').disabled = busy;
     if (elements) { try { elements.update({ amount: minor(amount) }); } catch (e) {} }
   } else {
@@ -730,7 +712,6 @@ async function doPayment() {
         amount: v.value,
         currency: CFG.currency || 'usd',
         name, message,
-        tts: !ttsOptOut,
         nonce: getNonce()
       })
     });
