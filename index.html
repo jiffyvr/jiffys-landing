@@ -227,13 +227,13 @@
   <section class="btnsec">
     <div class="grid2">
       <div class="block">
-        <a class="btn" href="https://www.twitch.tv/JiffyVR" style="background:#9146FF">Twitch</a>
+        <a class="btn" href="https://www.twitch.tv/JiffyVR" style="background:#9146FF" target="_blank" rel="noopener">Twitch</a>
       </div>
       <div class="block">
-        <a class="btn" href="https://discord.gg/zpZB93x" style="background:#5865F2">Discord</a>
+        <a class="btn" href="https://discord.gg/zpZB93x" style="background:#5865F2" target="_blank" rel="noopener">Discord</a>
       </div>
     </div>
-    <a class="btn full" href="https://kick.com/jiffyvr" style="background:#53fc18;color:#111">Kick</a>
+    <a class="btn full" href="https://kick.com/jiffyvr" style="background:#53fc18;color:#111" target="_blank" rel="noopener">Kick</a>
     <p class="active">Current Active Socials: <b>Twitch / Kick / Discord</b></p>
   </section>
 
@@ -244,9 +244,9 @@
       <summary>Full Links <span class="chev">⌄</span></summary>
       <div class="body">
         <ul class="linklist">
-          <a href="https://www.twitch.tv/JiffyVR">Twitch <span>↗</span></a>
-          <a href="https://kick.com/jiffyvr">Kick <span>↗</span></a>
-          <a href="https://discord.gg/zpZB93x">Discord <span>↗</span></a>
+          <a href="https://www.twitch.tv/JiffyVR" target="_blank" rel="noopener">Twitch <span>↗</span></a>
+          <a href="https://kick.com/jiffyvr" target="_blank" rel="noopener">Kick <span>↗</span></a>
+          <a href="https://discord.gg/zpZB93x" target="_blank" rel="noopener">Discord <span>↗</span></a>
           <a href="/donate">Donate 💕 <span>↗</span></a>
         </ul>
       </div>
@@ -285,7 +285,8 @@
     {icon:"🟢", t:"Kick", p:"Live", d:"Same chaos, other couch", url:"https://kick.com/jiffyvr"},
     {icon:"💬", t:"Discord", p:"Join", d:"The community hangout", url:"https://discord.gg/zpZB93x"}
   ];
-  const adCard = a => '<a class="adcard" href="'+a.url+'"><div class="thumb">'
+  const adCard = a => '<a class="adcard" href="'+a.url+'"'
+    + (/^https?:/.test(a.url) ? ' target="_blank" rel="noopener"' : '') + '><div class="thumb">'
     + (/^(https?:|\/)/.test(a.icon) ? '<img src="'+a.icon+'" alt=""/>' : a.icon)
     + '</div><div class="meta"><div class="t">'+a.t+'</div><div class="p">'+a.p+'</div><div class="d">'+a.d+'</div></div></a>';
   (function buildTicker(){
