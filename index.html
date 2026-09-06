@@ -39,6 +39,14 @@
   .nav nav a{text-decoration:none;font-weight:600;font-size:15px;color:var(--ink2);padding:4px 2px;border-bottom:2px solid transparent}
   .nav nav a.active,.nav nav a:hover{color:var(--ink);border-color:var(--accent)}
 
+  /* LIVE pill — hidden until /live says we're streaming */
+  .nav nav a.livepill{display:inline-flex;align-items:center;gap:6px;color:#fff;background:var(--accent-d);
+    border-radius:999px;padding:4px 11px;font-size:12px;font-weight:700;letter-spacing:.4px;border-bottom:0}
+  .nav nav a.livepill:hover{color:#fff;border-color:transparent;filter:brightness(1.08)}
+  .livepill .livedot{width:7px;height:7px;border-radius:50%;background:#fff;flex:none;animation:livepulse 1.6s ease-in-out infinite}
+  @keyframes livepulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.75)}}
+  .livepill[hidden]{display:none!important}
+
   /* banner */
   .banner{position:relative;height:var(--banner-h);background:
       radial-gradient(120% 90% at 80% 10%, #ffe9b0 0%, transparent 45%),
@@ -129,6 +137,7 @@
     <nav>
       <a href="#home" class="active">Home</a>
       <a href="/donate">Donate 💕</a>
+      <a id="livePill" class="livepill" target="_blank" rel="noopener" hidden><span class="livedot" aria-hidden="true"></span><span id="livePillText">LIVE</span></a>
     </nav>
   </header>
 
@@ -211,6 +220,32 @@
     const block = Math.max(1, Math.ceil((viewW + 100) / oneW)); // copies needed to overflow the screen
     let html = ""; for (let i = 0; i < block * 2; i++) html += one; // 2 blocks; translateX(-50%) = exactly 1 block → seamless, gapless
     t.innerHTML = html;
+  })();
+
+  // LIVE pill — polls /live once at load then every 60s; silent + hidden on any failure
+  (function(){
+    const LIVE_API = "https://jiffys-api.tail1d1f7b.ts.net:10000/live";
+    const pill = document.getElementById("livePill");
+    const text = document.getElementById("livePillText");
+    const hide = () => { pill.hidden = true; };
+    async function checkLive(){
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 8000);
+      try{
+        const r = await fetch(LIVE_API, { signal: ctrl.signal, credentials: "omit" });
+        if(!r.ok){ hide(); return; }
+        const j = await r.json();
+        if(j && j.live === true){
+          const p = j.primary || null;
+          text.textContent = (p && p.platform) ? "LIVE on " + String(p.platform).toUpperCase() : "LIVE";
+          if(p && p.url) pill.setAttribute("href", p.url); else pill.removeAttribute("href");
+          pill.hidden = false;
+        } else hide();
+      }catch(e){ hide(); }
+      finally{ clearTimeout(timer); }
+    }
+    checkLive();
+    setInterval(checkLive, 60000);
   })();
 
   // highlight nav on scroll

@@ -47,6 +47,13 @@
   .crumbs{font-size:13px;color:var(--ink2);font-weight:600}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 20px}
   h1{font-size:24px;font-weight:700}
+  .cardhead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .livepill{display:inline-flex;align-items:center;gap:5px;text-decoration:none;flex:none;
+    font-family:"Quicksand","Inter",sans-serif;font-weight:700;font-size:11px;letter-spacing:.4px;
+    color:#fff;background:var(--accent);border-radius:999px;padding:3px 9px;transition:.12s}
+  .livepill:hover{filter:brightness(1.08)}
+  .livepill .livedot{width:6px;height:6px;border-radius:50%;background:#fff;flex:none;animation:livepulse 1.6s ease-in-out infinite}
+  @keyframes livepulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.75)}}
   .sub{color:var(--ink2);font-size:14px;margin:4px 0 16px}
   .state{text-align:center;padding:42px 22px}
   .state .big{font-size:46px;display:block;margin-bottom:8px}
@@ -135,7 +142,10 @@
 
     <!-- main form -->
     <section id="donate" class="card" hidden>
-      <h1>Send a tip 💕</h1>
+      <div class="cardhead">
+        <h1>Send a tip 💕</h1>
+        <a id="livePill" class="livepill" target="_blank" rel="noopener" hidden><span class="livedot" aria-hidden="true"></span><span id="livePillText">LIVE</span></a>
+      </div>
       <p class="sub">Tips pop up on stream with your name and message. Thank you for the support!</p>
 
       <div class="tabs" id="tabs" role="tablist" hidden>
@@ -826,6 +836,32 @@ function showThanks() {
 $('againBtn').addEventListener('click', () => location.reload());
 $('procBack').addEventListener('click', () => location.reload());
 $('retryBtn').addEventListener('click', init);
+
+/* ── LIVE pill: polls /live once at load then every 60s; silent + hidden on any failure ── */
+(function () {
+  const LIVE_API = 'https://jiffys-api.tail1d1f7b.ts.net:10000/live';
+  const pill = $('livePill');
+  const text = $('livePillText');
+  const hide = () => { pill.hidden = true; };
+  async function checkLive() {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    try {
+      const r = await fetch(LIVE_API, { signal: ctrl.signal, credentials: 'omit' });
+      if (!r.ok) { hide(); return; }
+      const j = await r.json();
+      if (j && j.live === true) {
+        const p = j.primary || null;
+        text.textContent = (p && p.platform) ? 'LIVE on ' + String(p.platform).toUpperCase() : 'LIVE';
+        if (p && p.url) pill.setAttribute('href', p.url); else pill.removeAttribute('href');
+        pill.hidden = false;
+      } else hide();
+    } catch (e) { hide(); }
+    finally { clearTimeout(timer); }
+  }
+  checkLive();
+  setInterval(checkLive, 60000);
+})();
 
 init();
 </script>
