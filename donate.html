@@ -80,6 +80,9 @@
   .ghost:hover{border-color:var(--accent);color:var(--accent-d)}
   .spin{width:15px;height:15px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;display:inline-block;vertical-align:-2px;margin-right:8px;animation:whirl .8s linear infinite}
   .fine{font-size:12px;color:var(--ink2);text-align:center;margin-top:12px}
+  .ttshint{font-size:13px;color:var(--ink2);text-align:center;margin-top:10px;
+    opacity:.55;transition:all .25s}
+  .ttshint.on{opacity:1;color:#e6b94d;font-weight:700;transform:scale(1.04)}
 
   .cryptonote{color:var(--ink2);font-size:14px;margin-bottom:14px}
   .wallet{display:flex;gap:14px;align-items:center;border:1px solid var(--line);border-radius:12px;background:var(--field);padding:12px;margin-bottom:10px}
@@ -154,6 +157,7 @@
           <div class="ordiv"><span>or pay with card</span></div>
         </div>
         <div id="payment-element"></div>
+        <p class="ttshint" id="ttsHint">🔊 tips of $5+ get read out loud on stream</p>
         <p class="err" id="payErr" role="alert" aria-live="polite"></p>
         <button id="donateBtn" class="cta"><span class="spin" id="btnSpin" hidden></span><span id="btnLabel">Donate</span></button>
       </div>
@@ -441,6 +445,7 @@ const COIN_COLORS = { BTC: '#f7931a', ETH: '#627eea', LTC: '#345d9d', DOGE: '#c2
 
 let CFG = null;
 let paypalPicked = false;
+let TTS_MIN = 5;
 function donateLabel() {
   const v = (typeof amount === 'number' && amount > 0) ? 'Donate ' + fmt(amount) + ' 💕' : 'Donate';
   return v;
@@ -476,6 +481,10 @@ async function init() {
   }
   CFG = cfg;
   if (typeof cfg.max_amount === 'number' && cfg.max_amount > 0) MAX_AMOUNT = cfg.max_amount;
+  const tm = Number(cfg.tts_min);
+  if (tm > 0) { TTS_MIN = tm; }
+  const th = $('ttsHint');
+  if (th) th.textContent = '🔊 tips of ' + sym() + TTS_MIN + '+ get read out loud on stream';
 
   const stripeReady = !!(cfg.stripe_enabled && cfg.publishable_key && window.Stripe);
   if (stripeReady) {
@@ -586,6 +595,8 @@ function updateAmountUI() {
     $('presets').querySelectorAll('.chip').forEach(ch =>
       ch.classList.toggle('sel', Number(ch.dataset.amt) === amount));
     $('btnLabel').textContent = paypalPicked ? 'Continue to PayPal ↗' : donateLabel();
+    const hint = $('ttsHint');
+    if (hint) hint.classList.toggle('on', amount >= TTS_MIN);
     $('donateBtn').disabled = busy;
     if (elements) { try { elements.update({ amount: minor(amount) }); } catch (e) {} }
   } else {
