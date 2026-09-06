@@ -6,6 +6,8 @@
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&text=%E2%9C%A8%E2%AD%90%F0%9F%8C%B8%F0%9F%92%95%F0%9F%92%AC%F0%9F%9F%A2%F0%9F%9F%A3&display=swap" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#e0588f" />
   <meta name="mobile-web-app-capable" content="yes" />
@@ -89,6 +91,10 @@
       radial-gradient(120% 100% at 10% 90%, #ffd0e0 0%, transparent 50%),
       linear-gradient(135deg,#ffe3ec,#ffd8c2);
     display:flex;align-items:center;justify-content:center;overflow:hidden}
+  /* one emoji font everywhere, so desktop stops rendering Segoe's flat set */
+  .sparkle,.adcard .thumb,.livepill,.tipjar,.donate,.nav nav a,.btn,.qa h4,
+  .adcard .t,.adcard .p{font-family:"Noto Color Emoji","Quicksand","Inter",
+    -apple-system,"Segoe UI Emoji",sans-serif}
   .banner .sparkle{position:absolute;font-size:42px;opacity:.7}
   .banner .s1{top:24px;left:10%}.banner .s2{bottom:30px;right:14%;font-size:30px}.banner .s3{top:40%;right:30%;font-size:22px}
   .banner .ph{font-family:"Quicksand";font-weight:700;font-size:22px;color:#b9657f;background:rgba(255,255,255,.55);
