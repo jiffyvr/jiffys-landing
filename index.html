@@ -91,10 +91,12 @@
       radial-gradient(120% 100% at 10% 90%, #ffd0e0 0%, transparent 50%),
       linear-gradient(135deg,#ffe3ec,#ffd8c2);
     display:flex;align-items:center;justify-content:center;overflow:hidden}
-  /* one emoji font everywhere, so desktop stops rendering Segoe's flat set */
-  .sparkle,.adcard .thumb,.livepill,.tipjar,.donate,.nav nav a,.btn,.qa h4,
-  .adcard .t,.adcard .p{font-family:"Noto Color Emoji","Quicksand","Inter",
-    -apple-system,"Segoe UI Emoji",sans-serif}
+  /* desktop only, ticker cards only: Windows renders these with Segoe UI
+     Emoji, which looks flat beside the phone version. Everything else on the
+     page keeps the platform's native emoji. */
+  @media (min-width:561px){
+    .bannermarq .adcard .thumb{font-family:"Noto Color Emoji","Segoe UI Emoji",sans-serif}
+  }
   .banner .sparkle{position:absolute;font-size:42px;opacity:.7}
   .banner .s1{top:24px;left:10%}.banner .s2{bottom:30px;right:14%;font-size:30px}.banner .s3{top:40%;right:30%;font-size:22px}
   .banner .ph{font-family:"Quicksand";font-weight:700;font-size:22px;color:#b9657f;background:rgba(255,255,255,.55);
