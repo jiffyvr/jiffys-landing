@@ -82,8 +82,18 @@ self.addEventListener('notificationclick', (event) => {
       }
     }
 
-    /* Cross-origin (the usual case: the stream itself) always opens a window. */
-    if (self.clients.openWindow) return self.clients.openWindow(target);
+    /* Cross-origin (the usual case: the stream itself). openWindow() is a
+       programmatic navigation with no user gesture, so iOS/Android skip the
+       Universal/App Link check and render the stream INSIDE this PWA instead
+       of handing off to the native app. Route through a same-origin hop that
+       re-issues the navigation as a real link activation. */
+    if (self.clients.openWindow) {
+      var hop = target;
+      if (!sameOrigin) {
+        hop = self.location.origin + '/go.html?to=' + encodeURIComponent(target);
+      }
+      return self.clients.openWindow(hop);
+    }
   })());
 });
 

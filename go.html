@@ -1,0 +1,50 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Opening…</title>
+<style>
+  :root{color-scheme:light dark}
+  body{margin:0;min-height:100svh;display:grid;place-items:center;
+       background:#fbe1e8;color:#5a2740;
+       font:16px/1.5 "Quicksand",system-ui,sans-serif;text-align:center;padding:24px}
+  @media (prefers-color-scheme:dark){body{background:#1a0f16;color:#f6dbe6}}
+  .card{max-width:420px}
+  h1{font-size:20px;margin:0 0 6px}
+  p{margin:0 0 20px;opacity:.75;font-size:14px}
+  a.go{display:block;padding:16px 20px;border-radius:14px;background:#e0588f;
+       color:#fff;text-decoration:none;font-weight:700;font-size:18px}
+  a.go:active{transform:scale(.99)}
+  .small{display:block;margin-top:14px;font-size:13px;opacity:.6;color:inherit}
+</style>
+<div class="card">
+  <h1>Opening the stream…</h1>
+  <p>If it doesn't open by itself, tap below.</p>
+  <a class="go" id="go" href="#">Open now</a>
+  <a class="small" id="home" href="/">back to jiffys.info</a>
+</div>
+<script>
+/* A service-worker notificationclick has no user gesture, so iOS/Android skip
+   their Universal/App Link check and load the URL inside the PWA. This page is
+   the gesture-bearing hop: it retries the navigation as a real link activation,
+   which is the same thing that already works when tapping links on the site. */
+(function () {
+  var p = new URLSearchParams(location.search);
+  var to = p.get('to') || '';
+  // only ever forward to an absolute http(s) URL we were handed
+  if (!/^https?:\/\//i.test(to)) to = 'https://kick.com/jiffyvr';
+  var a = document.getElementById('go');
+  a.href = to;
+
+  // 1) synthesize a real link activation (counts as a navigation from a link,
+  //    which is what triggers the native-app handoff on both platforms)
+  function jump() {
+    try {
+      a.click();
+    } catch (e) {}
+    // 2) belt and braces for browsers that ignore a synthetic click
+    setTimeout(function () { try { location.replace(to); } catch (e) {} }, 350);
+  }
+  // let the page paint first so the tap target exists if the auto-attempt fails
+  setTimeout(jump, 60);
+})();
+</script>
