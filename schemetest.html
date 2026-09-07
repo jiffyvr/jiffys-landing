@@ -1,0 +1,25 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scheme test</title>
+<style>
+  body{margin:0;padding:20px;background:#1a0f16;color:#f6dbe6;
+       font:16px/1.5 system-ui,sans-serif}
+  h1{font-size:19px;margin:0 0 4px}
+  p{opacity:.7;font-size:13px;margin:0 0 16px}
+  a{display:block;padding:14px 16px;margin:8px 0;border-radius:12px;
+    background:#e0588f;color:#fff;text-decoration:none;font-weight:700}
+  a.alt{background:#3a2430}
+  code{font-size:12px;opacity:.75;font-weight:400}
+</style>
+<h1>Which one opens the Kick app?</h1>
+<p>Tap each. The one that launches Kick (instead of erroring or doing
+nothing) is the scheme we can auto-redirect to — no tap needed after that.</p>
+
+<a href="kick://channel/jiffyvr">1 &nbsp;<code>kick://channel/jiffyvr</code></a>
+<a href="kick://jiffyvr">2 &nbsp;<code>kick://jiffyvr</code></a>
+<a href="kick://">3 &nbsp;<code>kick://</code></a>
+<a href="kickcom://jiffyvr">4 &nbsp;<code>kickcom://jiffyvr</code></a>
+<a href="com.kick.mobile://jiffyvr">5 &nbsp;<code>com.kick.mobile://</code></a>
+<a class="alt" href="intent://kick.com/jiffyvr#Intent;scheme=https;package=com.kick.mobile;end">6 &nbsp;<code>intent:// (Android only)</code></a>
+<a class="alt" href="https://kick.com/jiffyvr">7 &nbsp;<code>plain https (control)</code></a>
