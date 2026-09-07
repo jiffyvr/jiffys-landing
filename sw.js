@@ -87,13 +87,25 @@ self.addEventListener('notificationclick', (event) => {
        Universal/App Link check and render the stream INSIDE this PWA instead
        of handing off to the native app. Route through a same-origin hop that
        re-issues the navigation as a real link activation. */
-    if (self.clients.openWindow) {
-      var hop = target;
-      if (!sameOrigin) {
-        hop = self.location.origin + '/go.html?to=' + encodeURIComponent(target);
-      }
-      return self.clients.openWindow(hop);
-    }
+    if (!self.clients.openWindow) return;
+
+    /* openWindow() navigations are renderer-initiated with user_gesture=false,
+       so Chromium's ExternalNavigationHandler never consults the App Link and
+       iOS never follows the Universal Link — the stream just renders inside
+       this PWA. Only a genuine anchor tap clears that gate, so on PHONES we
+       open a page that exists to be that tap. Desktop has no native app to
+       hand off to, so it goes straight through. */
+    var ua = (self.navigator && self.navigator.userAgent) || '';
+    var phone = /Android|iPhone|iPod/i.test(ua);
+    try {
+      var uad = self.navigator && self.navigator.userAgentData;
+      if (uad && typeof uad.mobile === 'boolean') phone = uad.mobile;
+    } catch (e) {}
+
+    var hop = (!sameOrigin && phone)
+      ? self.location.origin + '/go.html?to=' + encodeURIComponent(target)
+      : target;
+    return self.clients.openWindow(hop);
   })());
 });
 

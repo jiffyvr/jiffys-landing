@@ -1,7 +1,7 @@
 <!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Opening…</title>
+<title>Watch on Kick</title>
 <style>
   :root{color-scheme:light dark}
   body{margin:0;min-height:100svh;display:grid;place-items:center;
@@ -9,43 +9,51 @@
        font:16px/1.5 "Quicksand",system-ui,sans-serif;text-align:center;padding:24px}
   @media (prefers-color-scheme:dark){body{background:#1a0f16;color:#f6dbe6}}
   .card{max-width:420px}
-  h1{font-size:20px;margin:0 0 6px}
+  h1{font-size:22px;margin:0 0 6px}
   p{margin:0 0 20px;opacity:.75;font-size:14px}
-  a.go{display:block;padding:16px 20px;border-radius:14px;background:#e0588f;
-       color:#fff;text-decoration:none;font-weight:700;font-size:18px}
+  a.go{display:block;padding:18px 20px;border-radius:14px;background:#e0588f;
+       color:#fff;text-decoration:none;font-weight:700;font-size:19px}
   a.go:active{transform:scale(.99)}
   .small{display:block;margin-top:14px;font-size:13px;opacity:.6;color:inherit}
 </style>
 <div class="card">
-  <h1 id="h">Opening the stream…</h1>
-  <p id="sub">If it doesn't jump on its own, tap below.</p>
-  <a class="go" id="go" href="#">▶ Watch on Kick</a>
+  <h1>Jiffy's is live &gt;.&lt;</h1>
+  <p id="sub">Tap to open the stream.</p>
+  <a class="go" id="go" href="https://kick.com/jiffyvr">&#9654; Watch on Kick</a>
   <a class="small" id="home" href="/">back to jiffys.info</a>
 </div>
 <script>
-/* A notificationclick has no user gesture, so iOS/Android skip their
-   Universal/App Link check and openWindow() lands here inside the PWA.
-   This page re-issues the navigation; on iOS the automatic attempt is
-   often refused, which is why the tap target is the real product and
-   the auto-attempt is only a bonus. */
+/* Why there is no auto-redirect on phones:
+   a notification click gives the navigation it starts NO user activation, and
+   both Android App Links and iOS Universal Links refuse to hand off to the
+   native app without one. A finger on a real <a href> is the only thing that
+   supplies it, so the button IS the mechanism — auto-navigating here would
+   just consume the click and land inside the in-app browser. Desktop has no
+   app to hand off to, so it jumps on its own. */
 (function () {
-  var p = new URLSearchParams(location.search);
-  var to = p.get('to') || '';
-  if (!/^https?:\/\//i.test(to)) to = 'https://kick.com/jiffyvr';
+  var DEFAULT = 'https://kick.com/jiffyvr';
+  var AUTO_OK = { 'kick.com': 1, 'www.kick.com': 1,
+                  'jiffys.info': 1, 'www.jiffys.info': 1 };
+
+  var to = new URLSearchParams(location.search).get('to') || '';
+  if (!/^https:\/\//i.test(to)) to = DEFAULT;
+  var u;
+  try { u = new URL(to); } catch (e) { to = DEFAULT; u = new URL(to); }
 
   var a = document.getElementById('go');
   a.href = to;
-  try { a.textContent = '▶ Watch on ' + new URL(to).hostname.replace(/^www\./, ''); }
-  catch (e) {}
+  try {
+    var host = u.hostname.replace(/^www\./, '');
+    a.innerHTML = '&#9654; Watch on ' + host.charAt(0).toUpperCase() +
+                  host.slice(1).replace(/\.com$/, '');
+  } catch (e) {}
 
-  // immediate top-level attempt (works on Android/desktop)
-  try { location.replace(to); } catch (e) {}
+  var phone = /Android|iPhone|iPod/i.test(navigator.userAgent) ||
+              (navigator.userAgentData && navigator.userAgentData.mobile === true);
 
-  // if we're still here a moment later, the browser refused it: make the
-  // tap obvious instead of pretending something is happening
-  setTimeout(function () {
-    document.getElementById('h').textContent = 'Tap to watch';
-    document.getElementById('sub').textContent = 'Your browser blocked the automatic jump.';
-  }, 1200);
+  if (!phone && AUTO_OK[u.hostname]) {
+    document.getElementById('sub').textContent = 'Opening the stream…';
+    setTimeout(function () { location.replace(to); }, 250);
+  }
 })();
 </script>
