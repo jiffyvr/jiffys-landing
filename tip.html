@@ -532,6 +532,26 @@ async function init() {
     if (stripe) { await handleReturn(retSecret, retId); return; }
   }
 
+  // A crypto invoice comes back with only ?thanks=1 (?paid=1 on older links)
+  // and no intent to confirm. The webhook is what actually credits the tip —
+  // this is only the human-facing half, so it must never be mistaken for
+  // proof of payment, but showing the form again reads as "it didn't work"
+  // and invites a second payment.
+  if (!retSecret && (qp.get('thanks') === '1' || qp.get('paid') === '1')) {
+    history.replaceState({}, '', location.pathname + (_apiOverride ? '?api=' + encodeURIComponent(_apiOverride) : ''));
+    let stash = {};
+    try { stash = JSON.parse(sessionStorage.getItem('jiffy_tip') || '{}'); }
+    catch (e) { /* private mode: fall through to the generic thank-you */ }
+    pendingDonation = {
+      name: stash.name || 'Anonymous',
+      amount: (typeof stash.amount === 'number') ? stash.amount : null,
+      currency: stash.currency || 'usd',
+      message: stash.message || ''
+    };
+    showThanks();
+    return;
+  }
+
   if (!stripe && !cryptoReady) {
     $('napText').textContent = 'No ways to tip are switched on right now — check back soon!';
     $('retryBtn').hidden = true;
@@ -878,6 +898,16 @@ async function payWithCrypto() {
       return;
     }
     resetNonce();               // a completed handoff must not reuse this one
+    try {
+      // the card lane stashes this before its redirect; the crypto lane has
+      // the same round trip and needs it for the same reason
+      sessionStorage.setItem('jiffy_tip', JSON.stringify({
+        name: $('name').value.trim().slice(0, 40) || 'Anonymous',
+        amount: v.value,
+        currency: (CFG.currency || 'usd'),
+        message: $('msg').value.trim().slice(0, 200)
+      }));
+    } catch (e) { /* private mode: generic thanks after the hop */ }
     location.href = data.invoice_url;
   } catch (e) {
     $('invoiceErr').textContent = 'Could not reach the tip jar — try again in a moment.';
