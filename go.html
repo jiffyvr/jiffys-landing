@@ -17,34 +17,35 @@
   .small{display:block;margin-top:14px;font-size:13px;opacity:.6;color:inherit}
 </style>
 <div class="card">
-  <h1>Opening the stream…</h1>
-  <p>If it doesn't open by itself, tap below.</p>
-  <a class="go" id="go" href="#">Open now</a>
+  <h1 id="h">Opening the stream…</h1>
+  <p id="sub">If it doesn't jump on its own, tap below.</p>
+  <a class="go" id="go" href="#">▶ Watch on Kick</a>
   <a class="small" id="home" href="/">back to jiffys.info</a>
 </div>
 <script>
-/* A service-worker notificationclick has no user gesture, so iOS/Android skip
-   their Universal/App Link check and load the URL inside the PWA. This page is
-   the gesture-bearing hop: it retries the navigation as a real link activation,
-   which is the same thing that already works when tapping links on the site. */
+/* A notificationclick has no user gesture, so iOS/Android skip their
+   Universal/App Link check and openWindow() lands here inside the PWA.
+   This page re-issues the navigation; on iOS the automatic attempt is
+   often refused, which is why the tap target is the real product and
+   the auto-attempt is only a bonus. */
 (function () {
   var p = new URLSearchParams(location.search);
   var to = p.get('to') || '';
-  // only ever forward to an absolute http(s) URL we were handed
   if (!/^https?:\/\//i.test(to)) to = 'https://kick.com/jiffyvr';
+
   var a = document.getElementById('go');
   a.href = to;
+  try { a.textContent = '▶ Watch on ' + new URL(to).hostname.replace(/^www\./, ''); }
+  catch (e) {}
 
-  // 1) synthesize a real link activation (counts as a navigation from a link,
-  //    which is what triggers the native-app handoff on both platforms)
-  function jump() {
-    try {
-      a.click();
-    } catch (e) {}
-    // 2) belt and braces for browsers that ignore a synthetic click
-    setTimeout(function () { try { location.replace(to); } catch (e) {} }, 350);
-  }
-  // let the page paint first so the tap target exists if the auto-attempt fails
-  setTimeout(jump, 60);
+  // immediate top-level attempt (works on Android/desktop)
+  try { location.replace(to); } catch (e) {}
+
+  // if we're still here a moment later, the browser refused it: make the
+  // tap obvious instead of pretending something is happening
+  setTimeout(function () {
+    document.getElementById('h').textContent = 'Tap to watch';
+    document.getElementById('sub').textContent = 'Your browser blocked the automatic jump.';
+  }, 1200);
 })();
 </script>
