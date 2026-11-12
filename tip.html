@@ -225,7 +225,7 @@
 'use strict';
 
 /* ════════════════════════ API base ════════════════════════ */
-const API = 'https://jiffys-api.tail1d1f7b.ts.net:10000/donate-api';
+const API = 'https://b.tail06976c.ts.net:10000/donate-api';
 // Local preview only: on localhost, ?api=http://127.0.0.1:PORT points at a dev/mock
 // backend. Ignored everywhere else, so the deployed page always uses API above.
 const _apiOverride = new URLSearchParams(location.search).get('api');
@@ -999,7 +999,7 @@ $('retryBtn').addEventListener('click', init);
 
 /* ── LIVE pill: polls /live once at load then every 60s; silent + hidden on any failure ── */
 (function () {
-  const LIVE_API = 'https://jiffys-api.tail1d1f7b.ts.net:10000/live';
+  const LIVE_API = 'https://b.tail06976c.ts.net:10000/live';
   const pill = $('livePill');
   const text = $('livePillText');
   const hide = () => { pill.hidden = true; };
