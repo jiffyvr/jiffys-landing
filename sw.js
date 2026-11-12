@@ -2,7 +2,7 @@
    Push notifications only. Deliberately caches NOTHING — a stale landing page
    would be worse than no PWA at all, so every request goes straight to the network. */
 
-const API           = 'https://jiffys-api.tail1d1f7b.ts.net:10000';
+const API           = 'https://b.tail06976c.ts.net:10000';
 const KEY_URL       = API + '/push/key';
 const SUB_URL       = API + '/push/subscribe';
 const FALLBACK_URL   = 'https://kick.com/jiffyvr';
